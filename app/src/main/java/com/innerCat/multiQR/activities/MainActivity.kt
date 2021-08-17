@@ -311,7 +311,9 @@ class MainActivity : AppCompatActivity() {
                 val output = result.contents
                 if (regexOptions.passes(output)) {
                     addItem(Item(output))
-                    initiateScan()
+                    if (batchScanEnabled()) {
+                        initiateScan()
+                    }
                 } else {
                     showMatchFailureDialog(output, (regexOptions as EnabledRegex).regex)
                 }
@@ -319,6 +321,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    /**
+     * @return Whether batch scanning is enabled
+     */
+    private fun batchScanEnabled(): Boolean {
+        return sharedPreferences.getBoolean(getString(R.string.sp_batch_scan), true)
     }
 
     /**

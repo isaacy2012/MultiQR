@@ -22,6 +22,7 @@
 
     <!-- Preference Titles -->
     <string name="settings_item_header">Item</string>
+    <string name="settings_scanning_header">Scanning</string>
     <string name="settings_email_header">Email</string>
     <string name="settings_regex_header">Regex</string>
     <string name="settings_about_header">About</string>
@@ -33,6 +34,7 @@
     <string name="sp_regex_string">sp_regex_string</string>
     <string name="sp_regex_enable">sp_regex_enable</string>
     <string name="sp_item_type">sp_item_type</string>
+    <string name="sp_batch_scan">sp_batch_scan</string>
 
     <!-- Messages Preferences -->
     <string name="email_address_title">Default email address</string>
@@ -40,7 +42,8 @@
     <string name="regex_string_title">Matching string</string>
     <string name="regex_enable_title">Enable matching</string>
     <string name="item_type_title">Item type</string>
-
+    <string name="batch_scan_title">Batch scanning</string>
+    <string name="batch_scan_summary">Immediately open the scanner again after a successful scan</string>
 
 
     <string name="alphanumeric">Alphanumeric</string>
