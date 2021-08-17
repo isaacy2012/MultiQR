@@ -3,7 +3,7 @@
  */
 package com.innerCat.multiQR.util
 
-import com.innerCat.multiQR.Id
+import com.innerCat.multiQR.Item
 
 /**
  * Parse a list of strings into a single CSV
@@ -13,9 +13,9 @@ import com.innerCat.multiQR.Id
  *
  * @param list - list to parse
  */
-fun listToString(list: List<Id>): String {
+fun listToString(list: List<Item>): String {
     return list.joinToString(","){
-        it.idString
+        it.dataString
     }
 }
 
@@ -27,16 +27,16 @@ fun listToString(list: List<Id>): String {
  *
  * @param list - list to parse
  */
-fun listToEmailString(list: List<Id>): String {
+fun listToEmailString(list: List<Item>): String {
     return list.joinToString(",\n"){
-        it.idString
+        it.dataString
     }
 }
 
-fun stringToList(str: String): ArrayList<Id> {
+fun stringToList(str: String): ArrayList<Item> {
     return if (str.isEmpty()) {
         ArrayList()
     } else {
-        ArrayList(str.split(",").map{ Id(it)})
+        ArrayList(str.split(",").map{ Item(it)})
     }
 }

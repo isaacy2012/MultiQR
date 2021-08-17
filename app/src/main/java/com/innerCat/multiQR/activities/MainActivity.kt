@@ -21,7 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.bold
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.innerCat.multiQR.Id
+import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(
                 "Ok"
             ) { _: DialogInterface?, _: Int ->
-                addItem(Id(manualG.editText.text.toString()))
+                addItem(Item(manualG.editText.text.toString()))
             }
             .setNegativeButton(
                 "Cancel"
@@ -176,6 +176,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_clear -> {
                 askToClearIds()
+                true
+            }
+            R.id.action_export -> {
+                export()
                 true
             }
             R.id.action_settings -> {
@@ -224,11 +228,21 @@ class MainActivity : AppCompatActivity() {
         sendEmail(this, adapter.itemList, address, subject)
     }
 
+    private fun export() {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, listToEmailString(adapter.itemList))
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
+    }
     /**
      * Add an item to the adapter and persistent data storage
      * @param item the Id object to add
      */
-    private fun addItem(item: Id) {
+    private fun addItem(item: Item) {
         adapter.addItem(item)
         mutateData()
     }
@@ -237,7 +251,7 @@ class MainActivity : AppCompatActivity() {
      * Remove an item from the adapter and persistent data storage
      * @param item The Id object to remove
      */
-    internal fun removeItem(item: Id) {
+    internal fun removeItem(item: Item) {
         adapter.removeItem(item)
         mutateData()
     }
@@ -272,7 +286,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(
                 "Add"
             ) { _: DialogInterface?, _: Int ->
-                addItem(Id(output))
+                addItem(Item(output))
                 initiateScan()
             }
             .setNegativeButton(
@@ -296,7 +310,7 @@ class MainActivity : AppCompatActivity() {
                 beep()
                 val output = result.contents
                 if (regexOptions.passes(output)) {
-                    addItem(Id(output))
+                    addItem(Item(output))
                     initiateScan()
                 } else {
                     showMatchFailureDialog(output, (regexOptions as EnabledRegex).regex)

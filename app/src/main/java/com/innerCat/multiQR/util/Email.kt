@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import com.innerCat.multiQR.Id
+import com.innerCat.multiQR.Item
 
 
 const val dateString: String = "\$date"
@@ -18,7 +18,7 @@ const val dateString: String = "\$date"
  * @param context - content to output to
  * @param itemList - list to output
  */
-fun sendEmail(context: Context, itemList: List<Id>, address: String?, subject: String?) {
+fun sendEmail(context: Context, itemList: List<Item>, address: String?, subject: String?) {
     // generate a selector to point the intent to ACTION_SENDTO
     val emailSelectorIntent = Intent(Intent.ACTION_SENDTO)
     emailSelectorIntent.data = Uri.parse("mailto:")

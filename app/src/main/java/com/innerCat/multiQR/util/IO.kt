@@ -4,7 +4,7 @@
 package com.innerCat.multiQR.util
 
 import android.content.SharedPreferences
-import com.innerCat.multiQR.Id
+import com.innerCat.multiQR.Item
 
 fun write(stringToWrite: String, sharedPreferences: SharedPreferences, spItemsStr: String) {
     val editor = sharedPreferences.edit()
@@ -12,7 +12,7 @@ fun write(stringToWrite: String, sharedPreferences: SharedPreferences, spItemsSt
     editor.apply()
 }
 
-fun saveData(itemList: List<Id>, sharedPreferences: SharedPreferences, spItemsStr: String) {
+fun saveData(itemList: List<Item>, sharedPreferences: SharedPreferences, spItemsStr: String) {
     write(listToString(itemList), sharedPreferences, spItemsStr)
 }
 

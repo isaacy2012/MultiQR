@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import com.innerCat.multiQR.Id
+import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.databinding.MainRvItemBinding
@@ -24,15 +24,15 @@ import java.util.*
 /**
  * Item Adapter for Items RecyclerView
  */
-class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
+class ItemAdapter(private var context: Context, items: ArrayList<Item>) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
-    private var items: ArrayList<Id>
-    private var itemSet: HashSet<Id>
+    private var items: ArrayList<Item>
+    private var itemSet: HashSet<Item>
 
     /**
      * Read only property for itemList
      */
-    val itemList: List<Id>
+    val itemList: List<Item>
         get() = items.toList()
 
 
@@ -41,7 +41,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
      */
     inner class ViewHolder(var g: MainRvItemBinding) : RecyclerView.ViewHolder(g.root),
         View.OnClickListener {
-        lateinit var item: Id
+        lateinit var item: Item
 
         init {
             g.root.setOnClickListener(this)
@@ -57,7 +57,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
             val manualG: ManualInputBinding =
                 ManualInputBinding.inflate((context as MainActivity).layoutInflater)
 
-            manualG.editText.setText(item.idString)
+            manualG.editText.setText(item.dataString)
             manualG.editText.requestFocus()
 
             builder.setTitle("Edit Item")
@@ -65,7 +65,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
                 .setPositiveButton(
                     "Ok"
                 ) { _: DialogInterface?, _: Int ->
-                    item.idString = manualG.editText.text.toString()
+                    item.dataString = manualG.editText.text.toString()
                     notifyItemChanged(items.indexOf(item))
                     (context as MainActivity).mutateData()
                 }
@@ -105,7 +105,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
      *
      * @param item     the Item to add
      */
-    fun addItem(item: Id) {
+    fun addItem(item: Item) {
         if (itemSet.contains(item) == false) {
             itemSet.add(item)
             items.add(0, item)
@@ -118,7 +118,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
      *
      * @param item     the item to remove
      */
-    fun removeItem(item: Id) {
+    fun removeItem(item: Item) {
         notifyItemRemoved(items.indexOf(item))
         itemSet.remove(item)
         items.remove(item)
@@ -139,7 +139,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
         // Get the data model based on position
         holder.item = items[position]
         val g: MainRvItemBinding = holder.g
-        g.idTV.text = holder.item.idString
+        g.idTV.text = holder.item.dataString
     }
 
     /**
