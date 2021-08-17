@@ -11,6 +11,7 @@ import android.media.ToneGenerator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
@@ -142,6 +143,9 @@ class MainActivity : AppCompatActivity() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
+        if (sharedPreferences.getString(getString(R.string.sp_item_type), "numeric").equals("numeric")) {
+            manualG.editText.inputType = InputType.TYPE_CLASS_NUMBER
+        }
         manualG.editText.addTextChangedListener(
             getManualAddTextWatcher(
                 manualG.editText,
