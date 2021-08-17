@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             emptyItemAdapter(this)
         }
+        g.toolbarLayout.title = getTitleString()
 
         // Attach the adapter to the recyclerview to populate items
         g.rvItems.adapter = adapter
@@ -77,6 +78,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Gets the title string counting how many items there are
+     * @return How many items there are as a formatted string
+     */
+    private fun getTitleString(): String {
+        val count = adapter.itemCount
+        return if (count == 0) {
+            "No items"
+        } else if (count == 1) {
+            "$count item"
+        } else {
+            "$count items"
+        }
+    }
+
+    /**
      * Ask the user if they are sure that all the IDs should be cleared
      */
     private fun askToClearIds() {
@@ -85,7 +101,7 @@ class MainActivity : AppCompatActivity() {
             MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
 
         builder.setMessage(
-            "Are you sure you wish to clear all IDs?"
+            "Are you sure you wish to clear all data?"
         )
             .setPositiveButton(
                 "Delete"
@@ -110,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 
         manualG.editText.requestFocus()
 
-        builder.setMessage("Student ID:")
+        builder.setTitle("Add Item")
             .setView(manualG.root)
             .setPositiveButton(
                 "Ok"
@@ -210,7 +226,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun addItem(item: Id) {
         adapter.addItem(item)
-        saveData()
+        mutateData()
     }
 
     /**
@@ -219,14 +235,15 @@ class MainActivity : AppCompatActivity() {
      */
     internal fun removeItem(item: Id) {
         adapter.removeItem(item)
-        saveData()
+        mutateData()
     }
 
     /**
      * Save the current adapter information to the persistent data storage
      */
-    internal fun saveData() {
+    internal fun mutateData() {
         saveData(adapter.itemList, sharedPreferences, getString(R.string.sp_items))
+        g.toolbarLayout.title = getTitleString()
     }
 
     /**

@@ -28,7 +28,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded.WithSize"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="@color/transparent"
-            app:title="2 Items"
+            app:title="Title"
             app:toolbarId="@+id/toolbar">
 
             <androidx.appcompat.widget.Toolbar
@@ -37,7 +37,17 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/transparent"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/Theme.multiQR.PopupOverlay" />
+                app:popupTheme="@style/Theme.multiQR.PopupOverlay">
+
+                <ImageView
+                    android:id="@+id/icon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="8dp"
+                    app:srcCompat="@drawable/ic_multiqr_icon" />
+
+            </androidx.appcompat.widget.Toolbar>
+
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

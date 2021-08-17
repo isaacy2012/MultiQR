@@ -1,0 +1,32 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient-3);
+      }
+
+      .cls-4 {
+        fill: url(#linear-gradient-4);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="258.17" y1="804.78" x2="258.17" y2="322.32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#003294"/>
+      <stop offset="1" stop-color="#3f95ff"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="476.66" y1="715.74" x2="476.66" y2="232.18" gradientTransform="matrix(0.71, -0.71, 0.59, 0.59, -198.85, 493.35)" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="741.84" y1="804.78" x2="741.84" y2="322.32" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-4" x1="536.31" y1="964.71" x2="536.31" y2="481.15" gradientTransform="matrix(0.71, 0.71, -0.59, 0.59, 628.25, -369.1)" xlink:href="#linear-gradient"/>
+  </defs>
+  <rect class="cls-1" x="169" y="188.05" width="178.32" height="624.95" rx="89.16"/>
+  <path class="cls-2" d="M562.9,580.16h0c-34.67,34.52-91.41,34.52-126.09,0L195,339.44a88.72,88.72,0,0,1,0-125.52h0c34.67-34.52,91.42-34.52,126.09,0L562.9,454.64A88.72,88.72,0,0,1,562.9,580.16Z"/>
+  <rect class="cls-3" x="652.68" y="188.05" width="178.32" height="624.95" rx="89.16"/>
+  <path class="cls-4" d="M436.87,579.9h0a88.72,88.72,0,0,1,0-125.52L678.69,213.66c34.68-34.52,91.42-34.52,126.1,0h0a88.74,88.74,0,0,1,0,125.52L563,579.9C528.29,614.42,471.55,614.42,436.87,579.9Z"/>
+</svg>

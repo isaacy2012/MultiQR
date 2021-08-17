@@ -60,14 +60,14 @@ class ItemAdapter(private var context: Context, items: ArrayList<Id>) :
             manualG.editText.setText(item.idString)
             manualG.editText.requestFocus()
 
-            builder.setMessage("Student ID:")
+            builder.setTitle("Edit Item")
                 .setView(manualG.root)
                 .setPositiveButton(
                     "Ok"
                 ) { _: DialogInterface?, _: Int ->
                     item.idString = manualG.editText.text.toString()
                     notifyItemChanged(items.indexOf(item))
-                    (context as MainActivity).saveData()
+                    (context as MainActivity).mutateData()
                 }
                 .setNegativeButton("Cancel") { _: DialogInterface?, _: Int ->
                     // User cancelled
