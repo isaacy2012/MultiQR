@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">MultiQR</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="no_email_error_message">No email application found</string>
+    <string name="warning_no_sp">Couldn\'t find SharedPreferences. Do not close the app, or all data will be lost!</string>
+    <string name="action_send">Send Email</string>
+    <string name="action_clear">Clear Data</string>
+    <string name="action_add_manually">Add Manually</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="regex_match_failure_title">ID Validation</string>
+
+    <string name="about_info">Made by Isaac Young and Nathanael Rais</string>
+
+    <!-- Preference Titles -->
+    <string name="settings_email_header">Email</string>
+    <string name="settings_regex_header">Regex</string>
+    <string name="settings_about_header">About</string>
+
+    <!-- SharedPreferences keys -->
+    <string name="sp_items">sp_items</string>
+    <string name="sp_email_address">sp_email_address</string>
+    <string name="sp_email_subject">sp_email_subject</string>
+    <string name="sp_regex_string">sp_regex_string</string>
+    <string name="sp_regex_enable">sp_regex_enable</string>
+
+    <!-- Messages Preferences -->
+    <string name="email_address_title">Default email address</string>
+    <string name="email_subject_title">Default email subject</string>
+    <string name="regex_string_title">Matching String</string>
+    <string name="regex_enable_title">Enable Matching</string>
+
+
+    <!-- Defaults -->
+    <string name="default_email_subject">MultiQR Scans - $date</string>
+    <string name="default_regex_string"></string>
+
+</resources>

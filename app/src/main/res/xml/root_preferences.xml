@@ -1,0 +1,46 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/settings_email_header">
+
+        <EditTextPreference
+            app:key="@string/sp_email_address"
+            app:title="@string/email_address_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_email_subject"
+            app:key="@string/sp_email_subject"
+            app:title="@string/email_subject_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/settings_regex_header">
+
+        <SwitchPreferenceCompat
+            app:key="@string/sp_regex_enable"
+            android:defaultValue="true"
+            app:title="@string/regex_enable_title"
+            />
+
+        <EditTextPreference
+            android:dependency="@string/sp_regex_enable"
+            android:defaultValue="@string/default_regex_string"
+            app:key="@string/sp_regex_string"
+            app:title="@string/regex_string_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/settings_about_header">
+
+        <Preference
+            android:key="pref_static_field_key"
+            android:selectable="false"
+            android:persistent="false"
+            android:summary="@string/about_info"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
