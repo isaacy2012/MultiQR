@@ -13,10 +13,8 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.text.SpannableStringBuilder
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.WindowManager
+import android.view.*
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +29,7 @@ import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.util.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.integration.android.IntentIntegrator
+import com.innerCat.multiQR.views.HeaderTextView
 
 
 /**
@@ -57,17 +56,9 @@ class MainActivity : AppCompatActivity() {
         // Create adapter from sharedPreferences
         val itemsString = sharedPreferences.getString(getString(R.string.sp_items), null)
         adapter = if (itemsString != null) {
-            val splitRegexEnable =
-                sharedPreferences.getBoolean(getString(R.string.sp_split_regex_enable), false)
-            val splitRegexString =
-                sharedPreferences.getString(getString(R.string.sp_split_regex_string), null)
             itemAdapterFromString(
                 this,
-                if (splitRegexEnable && splitRegexString != null) {
-                    EnabledRegex(splitRegexString)
-                } else {
-                    DisabledRegex()
-                },
+                getSplitRegex(),
                 itemsString
             )
         } else {
@@ -83,6 +74,37 @@ class MainActivity : AppCompatActivity() {
 
         g.fab.setOnClickListener {
             initiateScan()
+        }
+
+        populateHeader();
+    }
+
+    private fun populateHeader() {
+        val headerEnable = true
+        if (headerEnable == false) {
+            g.headerLayout.visibility = View.GONE
+            return
+        }
+        val headerString = "Name|id|idk"
+        getSplitRegex().split(headerString).forEach {
+            val spacedTextView = HeaderTextView(this, it)
+            g.headerLayout.addView(spacedTextView)
+        }
+
+    }
+
+    /**
+     * Get the splitRegex from sharedPreferences
+     */
+    private fun getSplitRegex() : OptionalRegex {
+        val splitRegexEnable =
+            sharedPreferences.getBoolean(getString(R.string.sp_split_regex_enable), false)
+        val splitRegexString =
+            sharedPreferences.getString(getString(R.string.sp_split_regex_string), null)
+        return if (splitRegexEnable && splitRegexString != null) {
+            EnabledRegex(splitRegexString)
+        } else {
+            DisabledRegex()
         }
     }
 
@@ -207,15 +229,7 @@ class MainActivity : AppCompatActivity() {
          * From settings, update the regex splitting of the cells.
          */
         registerForActivityResult(StartActivityForResult()) {
-            val splitRegexEnable =
-                sharedPreferences.getBoolean(getString(R.string.sp_split_regex_enable), false)
-            val splitRegexString =
-                sharedPreferences.getString(getString(R.string.sp_split_regex_string), null)
-            adapter.splitRegex = if (splitRegexEnable && splitRegexString != null) {
-                EnabledRegex(splitRegexString)
-            } else {
-                DisabledRegex()
-            }
+            adapter.splitRegex = getSplitRegex()
             adapter.notifyDataSetChanged()
         }
 

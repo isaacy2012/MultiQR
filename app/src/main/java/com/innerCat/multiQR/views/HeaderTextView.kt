@@ -9,9 +9,9 @@ import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
 import com.innerCat.multiQR.R
 
-open class CellView : LinearLayout {
+open class HeaderTextView : LinearLayout {
     init {
-        inflate(context, R.layout.cell, this)
+        inflate(context, R.layout.header_text_view, this)
         layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f)
 //        cardElevation = 0f
     }
@@ -23,7 +23,7 @@ open class CellView : LinearLayout {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, text: String) : super(context) {
-        val textView: TextView = findViewById(R.id.textTV)
+        val textView: TextView = findViewById(R.id.textView)
         textView.text = text
     }
 }
