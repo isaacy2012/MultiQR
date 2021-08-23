@@ -9,7 +9,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.idscanner"
+        applicationId "com.example.multiqr"
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 1

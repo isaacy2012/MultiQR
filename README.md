@@ -1,6 +1,6 @@
 # <img src="readMeImages/ic_logo.png"  width="25" height="25">  ID Scanner
 
-The IDScanner App allows you to easily manage signing in a variety of QR codes such as user ID's. Quickly construct lists of inputs to speed up your projects and events.
+The MultiQR App allows you to easily manage signing in a variety of QR codes such as user ID's. Quickly construct lists of inputs to speed up your projects and events.
 
 ## Created by Isaac Young and Nathanael Rais
 

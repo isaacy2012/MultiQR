@@ -19,7 +19,7 @@
     <string name="regex_match_failure_title">ID Validation</string>
 
     <string name="about_info">Made by Isaac Young</string>
-
+D
     <!-- Preference Titles -->
     <string name="settings_item_header">Item</string>
     <string name="settings_scanning_header">Scanning</string>
@@ -31,16 +31,20 @@
     <string name="sp_items">sp_items</string>
     <string name="sp_email_address">sp_email_address</string>
     <string name="sp_email_subject">sp_email_subject</string>
-    <string name="sp_regex_string">sp_regex_string</string>
-    <string name="sp_regex_enable">sp_regex_enable</string>
+    <string name="sp_match_regex_string">sp_match_regex_string</string>
+    <string name="sp_match_regex_enable">sp_match_regex_enable</string>
+    <string name="sp_split_regex_string">sp_split_regex_string</string>
+    <string name="sp_split_regex_enable">sp_split_regex_enable</string>
     <string name="sp_item_type">sp_item_type</string>
     <string name="sp_batch_scan">sp_batch_scan</string>
 
     <!-- Messages Preferences -->
     <string name="email_address_title">Default email address</string>
     <string name="email_subject_title">Default email subject</string>
-    <string name="regex_string_title">Matching string</string>
-    <string name="regex_enable_title">Enable matching</string>
+    <string name="match_regex_string_title">Matching string</string>
+    <string name="match_regex_enable_title">Enable matching</string>
+    <string name="split_regex_enable_title">Split into columns</string>
+    <string name="split_regex_string_title">Split string</string>
     <string name="item_type_title">Item type</string>
     <string name="batch_scan_title">Batch scanning</string>
     <string name="batch_scan_summary">Immediately open the scanner again after a successful scan</string>

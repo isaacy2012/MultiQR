@@ -17,6 +17,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.bold
@@ -54,13 +55,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Create adapter from sharedPreferences
-        adapter = if (sharedPreferences.getString(getString(R.string.sp_items), null) != null) {
+        val itemsString = sharedPreferences.getString(getString(R.string.sp_items), null)
+        adapter = if (itemsString != null) {
+            val splitRegexEnable =
+                sharedPreferences.getBoolean(getString(R.string.sp_split_regex_enable), false)
+            val splitRegexString =
+                sharedPreferences.getString(getString(R.string.sp_split_regex_string), null)
             itemAdapterFromString(
                 this,
-                sharedPreferences.getString(
-                    getString(R.string.sp_items),
-                    null
-                )!!
+                if (splitRegexEnable && splitRegexString != null) {
+                    EnabledRegex(splitRegexString)
+                } else {
+                    DisabledRegex()
+                },
+                itemsString
             )
         } else {
             emptyItemAdapter(this)
@@ -143,7 +151,9 @@ class MainActivity : AppCompatActivity() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (sharedPreferences.getString(getString(R.string.sp_item_type), "numeric").equals("numeric")) {
+        if (sharedPreferences.getString(getString(R.string.sp_item_type), "numeric")
+                .equals("numeric")
+        ) {
             manualG.editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
         manualG.editText.addTextChangedListener(
@@ -184,22 +194,44 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
+                launchActivityForResult.launch(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    var launchActivityForResult =
+        /**
+         * On Activity result
+         * From settings, update the regex splitting of the cells.
+         */
+        registerForActivityResult(StartActivityForResult()) {
+            val splitRegexEnable =
+                sharedPreferences.getBoolean(getString(R.string.sp_split_regex_enable), false)
+            val splitRegexString =
+                sharedPreferences.getString(getString(R.string.sp_split_regex_string), null)
+            adapter.splitRegex = if (splitRegexEnable && splitRegexString != null) {
+                EnabledRegex(splitRegexString)
+            } else {
+                DisabledRegex()
+            }
+            adapter.notifyDataSetChanged()
+        }
+
     /**
      * Initiate a scan
      */
     private fun initiateScan() {
         // set up regex
-        val regexEnable = sharedPreferences.getBoolean(getString(R.string.sp_regex_enable), true)
-        val regexString = sharedPreferences.getString(getString(R.string.sp_regex_string), getString(R.string.default_regex_string))
+        val matchRegexEnable =
+            sharedPreferences.getBoolean(getString(R.string.sp_match_regex_enable), true)
+        val matchRegexString = sharedPreferences.getString(
+            getString(R.string.sp_match_regex_string),
+            getString(R.string.default_regex_string)
+        )
         regexOptions =
-            if (regexEnable && regexString != null) EnabledRegex(regexString) else DisabledRegex()
+            if (matchRegexEnable && matchRegexString != null) EnabledRegex(matchRegexString) else DisabledRegex()
 
         val integrator = IntentIntegrator(this)
         integrator.setPrompt("Press back to finish")
@@ -238,6 +270,7 @@ class MainActivity : AppCompatActivity() {
         val shareIntent = Intent.createChooser(sendIntent, null)
         startActivity(shareIntent)
     }
+
     /**
      * Add an item to the adapter and persistent data storage
      * @param item the Id object to add

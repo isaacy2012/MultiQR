@@ -36,14 +36,26 @@
 
         <SwitchPreferenceCompat
             android:defaultValue="true"
-            app:key="@string/sp_regex_enable"
-            app:title="@string/regex_enable_title" />
+            app:key="@string/sp_match_regex_enable"
+            app:title="@string/match_regex_enable_title" />
 
         <EditTextPreference
             android:defaultValue="@string/default_regex_string"
-            android:dependency="@string/sp_regex_enable"
-            app:key="@string/sp_regex_string"
-            app:title="@string/regex_string_title"
+            android:dependency="@string/sp_match_regex_enable"
+            app:key="@string/sp_match_regex_string"
+            app:title="@string/match_regex_string_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:key="@string/sp_split_regex_enable"
+            app:title="@string/split_regex_enable_title" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_regex_string"
+            android:dependency="@string/sp_split_regex_enable"
+            app:key="@string/sp_split_regex_string"
+            app:title="@string/split_regex_string_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

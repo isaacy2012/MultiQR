@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.itemAdapter
 
 import android.content.Context
@@ -19,15 +16,37 @@ import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.assertions.assert
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.innerCat.multiQR.util.OptionalRegex
+import com.innerCat.multiQR.views.CellView
 import java.util.*
+import java.util.stream.IntStream
 
 /**
  * Item Adapter for Items RecyclerView
  */
-class ItemAdapter(private var context: Context, items: ArrayList<Item>) :
+class ItemAdapter(
+    private var context: Context,
+    var splitRegex: OptionalRegex,
+    items: ArrayList<Item>
+) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     private var items: ArrayList<Item>
     private var itemSet: HashSet<Item>
+
+    /**
+     * Pass in the tasks array into the Adapter
+     *
+     * @param items the items
+     */
+    init {
+        // Try to preserve order if there are no duplicates
+        this.items = ArrayList(items)
+        this.itemSet = HashSet(items)
+        // Otherwise make a new ArrayList from the HashSet
+        if (this.items.size != this.itemSet.size) {
+            this.items = ArrayList(itemSet)
+        }
+    }
 
     /**
      * Read only property for itemList
@@ -39,7 +58,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Item>) :
     /**
      * Provide a direct reference to each of the views within a data item
      */
-    inner class ViewHolder(var g: MainRvItemBinding) : RecyclerView.ViewHolder(g.root),
+    inner class ViewHolder(var g: MainRvItemBinding, var context: Context) : RecyclerView.ViewHolder(g.root),
         View.OnClickListener {
         lateinit var item: Item
 
@@ -129,7 +148,7 @@ class ItemAdapter(private var context: Context, items: ArrayList<Item>) :
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val context = parent.context
-        return ViewHolder(MainRvItemBinding.inflate(LayoutInflater.from(context), parent, false))
+        return ViewHolder(MainRvItemBinding.inflate(LayoutInflater.from(context), parent, false), context)
     }
 
     /**
@@ -139,7 +158,12 @@ class ItemAdapter(private var context: Context, items: ArrayList<Item>) :
         // Get the data model based on position
         holder.item = items[position]
         val g: MainRvItemBinding = holder.g
-        g.idTV.text = holder.item.dataString
+        g.root.removeAllViews()
+        val arr = splitRegex.split(holder.item.dataString)
+        arr.forEach {
+            val cell = CellView(holder.context, it)
+            g.root.addView(cell)
+        }
     }
 
     /**
@@ -150,18 +174,4 @@ class ItemAdapter(private var context: Context, items: ArrayList<Item>) :
         return items.size
     }
 
-    /**
-     * Pass in the tasks array into the Adapter
-     *
-     * @param items the items
-     */
-    init {
-        // Try to preserve order if there are no duplicates
-        this.items = ArrayList(items)
-        this.itemSet = HashSet(items)
-        // Otherwise make a new ArrayList from the HashSet
-        if (this.items.size != this.itemSet.size) {
-            this.items = ArrayList(itemSet)
-        }
-    }
 }
