@@ -1,10 +1,7 @@
-# <img src="readMeImages/ic_logo.png"  width="25" height="25">  ID Scanner
+# <img src="readMeImages/ic_logo.png"  width="25" height="25">  MultiQR
+## By Isaac Young
 
 The MultiQR App allows you to easily manage signing in a variety of QR codes such as user ID's. Quickly construct lists of inputs to speed up your projects and events.
-
-## Created by Isaac Young and Nathanael Rais
-
- Designed for **Victoria University of Wellington** this app was built in conjunction with the Faculty of Engineering and Computer Science and has helped lecturers and students across campuses.
 
 <img src="readMeImages/main.png"  width="150" height="290">
 
