@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.util
 
 interface OptionalRegex {
@@ -9,6 +6,8 @@ interface OptionalRegex {
      * @param str The string to match
      */
     fun passes(str: String): Boolean
+
+    fun split(str: String): List<String>
 }
 
 class EnabledRegex(regexString: String) : OptionalRegex {
@@ -21,6 +20,10 @@ class EnabledRegex(regexString: String) : OptionalRegex {
     override fun passes(str: String): Boolean {
         return regex.matches(str)
     }
+
+    override fun split(str: String): List<String> {
+        return regex.split(str)
+    }
 }
 
 class DisabledRegex : OptionalRegex {
@@ -30,5 +33,9 @@ class DisabledRegex : OptionalRegex {
      */
     override fun passes(str: String): Boolean {
         return true
+    }
+
+    override fun split(str: String): List<String> {
+        return listOf(str)
     }
 }

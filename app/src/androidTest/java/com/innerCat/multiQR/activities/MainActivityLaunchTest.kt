@@ -57,7 +57,7 @@ isDisplayed()))
         actionMenuItemView.perform(click())
         
         val appCompatEditText = onView(
-allOf(withId(R.id.editText),
+allOf(withId(R.id.edit),
 childAtPosition(
 childAtPosition(
 withId(R.id.custom),
@@ -67,7 +67,7 @@ isDisplayed()))
         appCompatEditText.perform(click())
         
         val appCompatEditText2 = onView(
-allOf(withId(R.id.editText),
+allOf(withId(R.id.edit),
 childAtPosition(
 childAtPosition(
 withId(R.id.custom),
@@ -86,13 +86,13 @@ withId(R.id.buttonPanel),
         materialButton.perform(scrollTo(), click())
         
         val textView = onView(
-allOf(withId(R.id.idTV), withText("3000454545656"),
+allOf(withId(R.id.textTV), withText("3000454545656"),
 withParent(withParent(withId(R.id.cardView))),
 isDisplayed()))
         textView.check(matches(withText("3000454545656")))
         
         val textView2 = onView(
-allOf(withId(R.id.idTV), withText("3000454545656"),
+allOf(withId(R.id.textTV), withText("3000454545656"),
 withParent(withParent(withId(R.id.cardView))),
 isDisplayed()))
         textView2.check(matches(withText("3000454545656")))
@@ -124,7 +124,7 @@ isDisplayed()))
         actionMenuItemView2.perform(click())
         
         val appCompatEditText3 = onView(
-allOf(withId(R.id.editText),
+allOf(withId(R.id.edit),
 childAtPosition(
 childAtPosition(
 withId(R.id.custom),
@@ -143,7 +143,7 @@ withId(R.id.buttonPanel),
         materialButton3.perform(scrollTo(), click())
         
         val textView3 = onView(
-allOf(withId(R.id.idTV), withText("10000000"),
+allOf(withId(R.id.textTV), withText("10000000"),
 withParent(withParent(withId(R.id.cardView))),
 isDisplayed()))
         textView3.check(matches(withText("10000000")))
@@ -161,7 +161,7 @@ isDisplayed()))
         pressBack()
         
         val textView4 = onView(
-allOf(withId(R.id.idTV), withText("10000000"),
+allOf(withId(R.id.textTV), withText("10000000"),
 withParent(withParent(withId(R.id.cardView))),
 isDisplayed()))
         textView4.check(matches(withText("10000000")))

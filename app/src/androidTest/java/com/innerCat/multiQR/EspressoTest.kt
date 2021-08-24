@@ -108,7 +108,7 @@ class HelloWorldEspressoTest {
         // Add item
         val appCompatEditText = onView(
             Matchers.allOf(
-                ViewMatchers.withId(R.id.editText),
+                ViewMatchers.withId(R.id.edit),
                 childAtPosition(
                     childAtPosition(
                         ViewMatchers.withId(R.id.custom),

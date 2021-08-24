@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.multiQR" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="android:windowLightStatusBar">true</item>
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryVariant">@color/primaryDarkColor</item>
@@ -11,10 +12,18 @@
         <item name="colorOnSecondary">@color/white</item>
         <item name="colorOnToolbar">@color/transparent</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+<!--        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/transparent</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+        <item name="android:navigationBarColor">@color/background_material_light</item>
         <!-- Customize your theme here. -->
         <item name="colorOnCard">#F6F6F6</item>
         <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
+        <item name="actionBarTheme">@style/TransparentActionBar</item>
+    </style>
+
+    <style name="TransparentActionBar" parent="">
+        <item name="colorPrimary">@color/transparent</item>
     </style>
 
     <style name="AppTheme.AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

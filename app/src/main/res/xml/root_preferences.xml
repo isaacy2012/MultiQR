@@ -9,18 +9,20 @@
         app:summary="%s"
         app:title="@string/item_type_title" />
 
+    <PreferenceCategory app:title="@string/settings_scanning_header">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:key="@string/sp_batch_scan"
+            app:summary="@string/batch_scan_summary"
+            app:title="@string/batch_scan_title" />
+    </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_email_header">
+    <PreferenceCategory app:title="@string/settings_export_header">
 
         <EditTextPreference
-            app:key="@string/sp_email_address"
-            app:title="@string/email_address_title"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            android:defaultValue="@string/default_email_subject"
-            app:key="@string/sp_email_subject"
-            app:title="@string/email_subject_title"
+            android:defaultValue="@string/default_export_file_name"
+            app:key="@string/sp_export_file_name"
+            app:title="@string/export_file_name_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
@@ -28,15 +30,37 @@
     <PreferenceCategory app:title="@string/settings_regex_header">
 
         <SwitchPreferenceCompat
-            android:defaultValue="true"
-            app:key="@string/sp_regex_enable"
-            app:title="@string/regex_enable_title" />
+            android:defaultValue="false"
+            app:key="@string/sp_match_regex_enable"
+            app:title="@string/match_regex_enable_title" />
 
         <EditTextPreference
             android:defaultValue="@string/default_regex_string"
-            android:dependency="@string/sp_regex_enable"
-            app:key="@string/sp_regex_string"
-            app:title="@string/regex_string_title"
+            android:dependency="@string/sp_match_regex_enable"
+            app:key="@string/sp_match_regex_string"
+            app:title="@string/match_regex_string_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/settings_columns_header">
+
+        <EditTextPreference
+            android:dialogLayout="@layout/manual_input"
+            android:defaultValue="@string/default_regex_string"
+            app:key="@string/sp_column_headers_string"
+            app:title="@string/column_headers_string_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            app:key="@string/sp_split_columns_enable"
+            app:title="@string/split_columns_enable_title" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_regex_string"
+            android:dependency="@string/sp_split_columns_enable"
+            app:key="@string/sp_split_regex_string"
+            app:title="@string/split_regex_string_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

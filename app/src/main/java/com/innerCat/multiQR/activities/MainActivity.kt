@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.activities
 
 import android.content.DialogInterface
@@ -13,14 +10,15 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.text.SpannableStringBuilder
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.WindowManager
+import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.zxing.integration.android.IntentIntegrator
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
@@ -28,8 +26,11 @@ import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.*
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.util.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.zxing.integration.android.IntentIntegrator
+import com.innerCat.multiQR.views.HeaderTextView
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
+import java.io.File
+import java.io.FileWriter
 
 
 /**
@@ -40,7 +41,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var g: MainActivityBinding
     private lateinit var adapter: ItemAdapter
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var regexOptions: OptionalRegex
+    private lateinit var matchRegex: OptionalRegex
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,13 +56,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Create adapter from sharedPreferences
-        adapter = if (sharedPreferences.getString(getString(R.string.sp_items), null) != null) {
-            itemAdapterFromString(
+        val items = loadData(this, sharedPreferences)
+        adapter = if (items.isEmpty() == false) {
+            itemAdapterFromList(
                 this,
-                sharedPreferences.getString(
-                    getString(R.string.sp_items),
-                    null
-                )!!
+                sharedPreferences.getSplitRegex(this),
+                items
             )
         } else {
             emptyItemAdapter(this)
@@ -76,20 +77,47 @@ class MainActivity : AppCompatActivity() {
         g.fab.setOnClickListener {
             initiateScan()
         }
+
+        matchRegex = sharedPreferences.getMatchRegex(this)
+        populateHeader();
     }
+
+    /**
+     * Populate the table header from sharedPreferences
+     */
+    private fun populateHeader() {
+        g.headerLayout.removeAllViews()
+        getHeaderStrings()?.forEach {
+            val spacedTextView = HeaderTextView(this, it)
+            g.headerLayout.addView(spacedTextView)
+        }
+    }
+
+    private fun getHeaderStrings(): List<String>? {
+        val headerString =
+            sharedPreferences.getString(getString(R.string.sp_column_headers_string), null)
+        if (headerString == null || headerString == "") {
+            return null
+        }
+        return adapter.splitRegex.split(headerString)
+    }
+
 
     /**
      * Gets the title string counting how many items there are
      * @return How many items there are as a formatted string
      */
     private fun getTitleString(): String {
-        val count = adapter.itemCount
-        return if (count == 0) {
-            "No items"
-        } else if (count == 1) {
-            "$count item"
-        } else {
-            "$count items"
+        return when (val count = adapter.itemCount) {
+            0 -> {
+                "No items"
+            }
+            1 -> {
+                "$count item"
+            }
+            else -> {
+                "$count items"
+            }
         }
     }
 
@@ -121,18 +149,26 @@ class MainActivity : AppCompatActivity() {
      * Manually add an entry
      */
     private fun addManually() {
+        if (checkShowLimitDialog() == false) {
+            return
+        }
         // Use the Builder class for convenient dialog construction
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
         val manualG: ManualInputBinding = ManualInputBinding.inflate(layoutInflater)
 
-        manualG.editText.requestFocus()
+        manualG.edit.requestFocus()
 
         builder.setTitle("Add Item")
             .setView(manualG.root)
             .setPositiveButton(
                 "Ok"
             ) { _: DialogInterface?, _: Int ->
-                addItem(Item(manualG.editText.text.toString()))
+                val output = manualG.edit.text.toString()
+                if (matchRegex.passes(output)) {
+                    addItem(Item(output))
+                } else {
+                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex)
+                }
             }
             .setNegativeButton(
                 "Cancel"
@@ -143,12 +179,17 @@ class MainActivity : AppCompatActivity() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (sharedPreferences.getString(getString(R.string.sp_item_type), "numeric").equals("numeric")) {
-            manualG.editText.inputType = InputType.TYPE_CLASS_NUMBER
+        if (sharedPreferences.getString(
+                getString(R.string.sp_item_type),
+                getString(R.string.default_item_type)
+            )
+                .equals("numeric")
+        ) {
+            manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
-        manualG.editText.addTextChangedListener(
+        manualG.edit.addTextChangedListener(
             getManualAddTextWatcher(
-                manualG.editText,
+                manualG.edit,
                 okButton
             )
         )
@@ -170,10 +211,6 @@ class MainActivity : AppCompatActivity() {
                 addManually()
                 true
             }
-            R.id.action_send -> {
-                emailData()
-                true
-            }
             R.id.action_clear -> {
                 askToClearIds()
                 true
@@ -184,7 +221,7 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
+                launchActivityForResult.launch(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -192,15 +229,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Check if we have reached the limit of adding items, and if so, show a dialog
+     */
+    private fun checkShowLimitDialog(): Boolean {
+        if (adapter.itemList.size >= resources.getInteger(R.integer.max_items_limit)) {
+            // Use the Builder class for convenient dialog construction
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
+            builder.setTitle("Item Limit Reached")
+                .setMessage("Sorry, you can only add up to 50 items. An update will be released later, which will allow adding of unlimited items.")
+                .setPositiveButton(
+                    "Ok"
+                ) { _: DialogInterface?, _: Int ->
+                }
+            val dialog = builder.create()
+            dialog.show()
+            return false
+        }
+        return true
+    }
+
+    /**
      * Initiate a scan
      */
     private fun initiateScan() {
-        // set up regex
-        val regexEnable = sharedPreferences.getBoolean(getString(R.string.sp_regex_enable), true)
-        val regexString = sharedPreferences.getString(getString(R.string.sp_regex_string), getString(R.string.default_regex_string))
-        regexOptions =
-            if (regexEnable && regexString != null) EnabledRegex(regexString) else DisabledRegex()
-
+        if (checkShowLimitDialog() == false) {
+            return
+        }
         val integrator = IntentIntegrator(this)
         integrator.setPrompt("Press back to finish")
         integrator.setOrientationLocked(true)
@@ -210,41 +264,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Email the data in the adapter
+     * Export a CSV to another app
      */
-    private fun emailData() {
-        val address: String?
-        val subject: String?
-        if (this::sharedPreferences.isInitialized) {
-            address = sharedPreferences.getString(getString(R.string.sp_email_address), null)
-            subject = sharedPreferences.getString(
-                getString(R.string.sp_email_subject),
-                getString(R.string.default_email_subject)
-            )
-        } else {
-            address = null
-            subject = null
-        }
-        sendEmail(this, adapter.itemList, address, subject)
-    }
-
     private fun export() {
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, listToEmailString(adapter.itemList))
-            type = "text/plain"
+        // Delete old files
+        filesDir.listFiles()?.forEach {
+            it.delete()
         }
+        // Make new file
+        val file = File(filesDir, sharedPreferences.getExportFileName(this) + ".csv")
+        val fileWriter = FileWriter(file)
+        val csvPrinter = getHeaderStrings()?.toTypedArray()?.let {
+            CSVPrinter(
+                fileWriter,
+                CSVFormat.Builder.create().setHeader(*it).setAllowMissingColumnNames(true)
+                    .build()
+            )
+        } ?: run {
+            CSVPrinter(fileWriter, CSVFormat.DEFAULT)
+        }
+        val splitRegex = adapter.splitRegex
 
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        startActivity(shareIntent)
+        // Write file with csvPrinter
+        adapter.itemList.forEach {
+            csvPrinter.printRecord(splitRegex.split(it.dataString))
+        }
+        fileWriter.close()
+
+        // Send file
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.putExtra(
+            Intent.EXTRA_STREAM,
+            FileProvider.getUriForFile(this, "com.multiQR.FileProvider", file)
+        );
+        intent.type = "text/csv";
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(intent)
     }
+
     /**
      * Add an item to the adapter and persistent data storage
      * @param item the Id object to add
      */
     private fun addItem(item: Item) {
-        adapter.addItem(item)
-        mutateData()
+        mutateData { adapter.addItem(item) }
     }
 
     /**
@@ -252,14 +315,14 @@ class MainActivity : AppCompatActivity() {
      * @param item The Id object to remove
      */
     internal fun removeItem(item: Item) {
-        adapter.removeItem(item)
-        mutateData()
+        mutateData { adapter.removeItem(item) }
     }
 
     /**
      * Save the current adapter information to the persistent data storage
      */
-    internal fun mutateData() {
+    internal fun mutateData(run: () -> Unit) {
+        run()
         saveData(adapter.itemList, sharedPreferences, getString(R.string.sp_items))
         g.toolbarLayout.title = getTitleString()
     }
@@ -302,23 +365,42 @@ class MainActivity : AppCompatActivity() {
      * Get the results
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null) {
-            if (result.contents == null) {
-                // User cancelled
-            } else {
+        IntentIntegrator.parseActivityResult(requestCode, resultCode, data)?.let { result ->
+            // If user didn't cancel, there will be contents
+            result.contents?.let { contents ->
                 beep()
-                val output = result.contents
-                if (regexOptions.passes(output)) {
+                val output = contents.filterNot { it == '\n' }.filterNot { it == '\r' }
+                if (matchRegex.passes(output)) {
                     addItem(Item(output))
-                    initiateScan()
+                    if (batchScanEnabled()) {
+                        initiateScan()
+                    }
                 } else {
-                    showMatchFailureDialog(output, (regexOptions as EnabledRegex).regex)
+                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex)
                 }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
+        } ?: super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    var launchActivityForResult =
+        /**
+         * On Activity result
+         * From settings, update the regex splitting of the cells.
+         */
+        registerForActivityResult(StartActivityForResult()) {
+            // set up regex
+            matchRegex = sharedPreferences.getMatchRegex(this)
+            populateHeader()
+            adapter.splitRegex = adapter.splitRegex
+            adapter.notifyDataSetChanged()
         }
+
+
+    /**
+     * @return Whether batch scanning is enabled
+     */
+    private fun batchScanEnabled(): Boolean {
+        return sharedPreferences.getBoolean(getString(R.string.sp_batch_scan), true)
     }
 
     /**

@@ -2,16 +2,10 @@
     <string name="app_name">MultiQR</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="no_email_error_message">No email application found</string>
     <string name="warning_no_sp">Couldn\'t find SharedPreferences. Do not close the app, or all data will be lost!</string>
-    <string name="action_send">Send Email</string>
     <string name="action_clear">Clear Data</string>
     <string name="action_export">Export</string>
     <string name="action_add_manually">Add Manually</string>
@@ -19,28 +13,36 @@
     <string name="regex_match_failure_title">ID Validation</string>
 
     <string name="about_info">Made by Isaac Young</string>
-
+D
     <!-- Preference Titles -->
     <string name="settings_item_header">Item</string>
-    <string name="settings_email_header">Email</string>
-    <string name="settings_regex_header">Regex</string>
+    <string name="settings_scanning_header">Scanning</string>
+    <string name="settings_export_header">Export</string>
+    <string name="settings_regex_header">Regex Matching</string>
+    <string name="settings_columns_header">Columns</string>
     <string name="settings_about_header">About</string>
 
     <!-- SharedPreferences keys -->
     <string name="sp_items">sp_items</string>
-    <string name="sp_email_address">sp_email_address</string>
-    <string name="sp_email_subject">sp_email_subject</string>
-    <string name="sp_regex_string">sp_regex_string</string>
-    <string name="sp_regex_enable">sp_regex_enable</string>
+    <string name="sp_export_file_name">sp_export_file_name</string>
+    <string name="sp_match_regex_string">sp_match_regex_string</string>
+    <string name="sp_match_regex_enable">sp_match_regex_enable</string>
+    <string name="sp_split_regex_string">sp_split_regex_string</string>
+    <string name="sp_split_columns_enable">sp_split_regex_enable</string>
+    <string name="sp_column_headers_string">sp_column_headers_string</string>
     <string name="sp_item_type">sp_item_type</string>
+    <string name="sp_batch_scan">sp_batch_scan</string>
 
     <!-- Messages Preferences -->
-    <string name="email_address_title">Default email address</string>
-    <string name="email_subject_title">Default email subject</string>
-    <string name="regex_string_title">Matching string</string>
-    <string name="regex_enable_title">Enable matching</string>
+    <string name="export_file_name_title">Export filename</string>
+    <string name="match_regex_string_title">Matching regex string</string>
+    <string name="match_regex_enable_title">Enable matching</string>
+    <string name="split_columns_enable_title">Split into columns</string>
+    <string name="split_regex_string_title">Split regex string</string>
+    <string name="column_headers_string_title">Column headers</string>
     <string name="item_type_title">Item type</string>
-
+    <string name="batch_scan_title">Batch scanning</string>
+    <string name="batch_scan_summary">Immediately open the scanner again after a successful scan</string>
 
 
     <string name="alphanumeric">Alphanumeric</string>
@@ -57,8 +59,9 @@
     </array>
 
     <!-- Defaults -->
-    <string name="default_email_subject">MultiQR Scans - $date</string>
+    <string name="default_export_file_name">MultiQR Scans - $date</string>
     <string name="default_regex_string"></string>
     <string name="default_item_type">@string/alphanumeric</string>
+    <string name="default_csv_export_filepath">multiQR_export.csv</string>
 
 </resources>

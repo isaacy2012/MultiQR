@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.assertions
 
 import com.innerCat.multiQR.BuildConfig

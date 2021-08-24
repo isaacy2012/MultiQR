@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/IDScanner.iml" filepath="$PROJECT_DIR$/.idea/IDScanner.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/IDScanner.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/IDScanner.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MultiQR.iml" filepath="$PROJECT_DIR$/.idea/modules/MultiQR.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MultiQR.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MultiQR.app.iml" />
     </modules>
   </component>
 </project>
