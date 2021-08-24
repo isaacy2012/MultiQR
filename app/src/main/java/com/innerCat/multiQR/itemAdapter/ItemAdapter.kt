@@ -19,18 +19,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.innerCat.multiQR.util.OptionalRegex
 import com.innerCat.multiQR.views.CellView
 import java.util.*
-import java.util.stream.IntStream
 
 /**
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
-    private var context: Context,
     var splitRegex: OptionalRegex,
-    items: ArrayList<Item>
+    items: MutableList<Item>
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
-    private var items: ArrayList<Item>
+    private var items: MutableList<Item>
     private var itemSet: HashSet<Item>
 
     /**
@@ -76,17 +74,17 @@ class ItemAdapter(
             val manualG: ManualInputBinding =
                 ManualInputBinding.inflate((context as MainActivity).layoutInflater)
 
-            manualG.editText.setText(item.dataString)
-            manualG.editText.requestFocus()
+            manualG.edit.setText(item.dataString)
+            manualG.edit.requestFocus()
 
             builder.setTitle("Edit Item")
                 .setView(manualG.root)
                 .setPositiveButton(
                     "Ok"
                 ) { _: DialogInterface?, _: Int ->
-                    item.dataString = manualG.editText.text.toString()
+                    item.dataString = manualG.edit.text.toString()
                     notifyItemChanged(items.indexOf(item))
-                    (context as MainActivity).mutateData()
+                    (context as MainActivity).mutateData{}
                 }
                 .setNegativeButton("Cancel") { _: DialogInterface?, _: Int ->
                     // User cancelled
@@ -100,9 +98,9 @@ class ItemAdapter(
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             okButton.isEnabled = true
-            manualG.editText.addTextChangedListener(
+            manualG.edit.addTextChangedListener(
                 getManualAddTextWatcher(
-                    manualG.editText,
+                    manualG.edit,
                     okButton
                 )
             )

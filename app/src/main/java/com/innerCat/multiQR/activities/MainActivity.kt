@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.activities
 
 import android.content.DialogInterface
@@ -14,12 +11,14 @@ import android.os.Looper
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.zxing.integration.android.IntentIntegrator
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
@@ -27,9 +26,11 @@ import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.*
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.util.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.zxing.integration.android.IntentIntegrator
 import com.innerCat.multiQR.views.HeaderTextView
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
+import java.io.File
+import java.io.FileWriter
 
 
 /**
@@ -40,7 +41,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var g: MainActivityBinding
     private lateinit var adapter: ItemAdapter
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var regexOptions: OptionalRegex
+    private lateinit var matchRegex: OptionalRegex
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +56,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Create adapter from sharedPreferences
-        val itemsString = sharedPreferences.getString(getString(R.string.sp_items), null)
-        adapter = if (itemsString != null) {
-            itemAdapterFromString(
+        val items = loadData(this, sharedPreferences)
+        adapter = if (items.isEmpty() == false) {
+            itemAdapterFromList(
                 this,
-                getSplitRegex(),
-                itemsString
+                sharedPreferences.getSplitRegex(this),
+                items
             )
         } else {
             emptyItemAdapter(this)
@@ -76,50 +78,46 @@ class MainActivity : AppCompatActivity() {
             initiateScan()
         }
 
+        matchRegex = sharedPreferences.getMatchRegex(this)
         populateHeader();
     }
 
+    /**
+     * Populate the table header from sharedPreferences
+     */
     private fun populateHeader() {
-        val headerEnable = true
-        if (headerEnable == false) {
-            g.headerLayout.visibility = View.GONE
-            return
-        }
-        val headerString = "Name|id|idk"
-        getSplitRegex().split(headerString).forEach {
+        g.headerLayout.removeAllViews()
+        getHeaderStrings()?.forEach {
             val spacedTextView = HeaderTextView(this, it)
             g.headerLayout.addView(spacedTextView)
         }
-
     }
 
-    /**
-     * Get the splitRegex from sharedPreferences
-     */
-    private fun getSplitRegex() : OptionalRegex {
-        val splitRegexEnable =
-            sharedPreferences.getBoolean(getString(R.string.sp_split_regex_enable), false)
-        val splitRegexString =
-            sharedPreferences.getString(getString(R.string.sp_split_regex_string), null)
-        return if (splitRegexEnable && splitRegexString != null) {
-            EnabledRegex(splitRegexString)
-        } else {
-            DisabledRegex()
+    private fun getHeaderStrings(): List<String>? {
+        val headerString =
+            sharedPreferences.getString(getString(R.string.sp_column_headers_string), null)
+        if (headerString == null || headerString == "") {
+            return null
         }
+        return adapter.splitRegex.split(headerString)
     }
+
 
     /**
      * Gets the title string counting how many items there are
      * @return How many items there are as a formatted string
      */
     private fun getTitleString(): String {
-        val count = adapter.itemCount
-        return if (count == 0) {
-            "No items"
-        } else if (count == 1) {
-            "$count item"
-        } else {
-            "$count items"
+        return when (val count = adapter.itemCount) {
+            0 -> {
+                "No items"
+            }
+            1 -> {
+                "$count item"
+            }
+            else -> {
+                "$count items"
+            }
         }
     }
 
@@ -155,14 +153,19 @@ class MainActivity : AppCompatActivity() {
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
         val manualG: ManualInputBinding = ManualInputBinding.inflate(layoutInflater)
 
-        manualG.editText.requestFocus()
+        manualG.edit.requestFocus()
 
         builder.setTitle("Add Item")
             .setView(manualG.root)
             .setPositiveButton(
                 "Ok"
             ) { _: DialogInterface?, _: Int ->
-                addItem(Item(manualG.editText.text.toString()))
+                val output = manualG.edit.text.toString()
+                if (matchRegex.passes(output)) {
+                    addItem(Item(output))
+                } else {
+                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex)
+                }
             }
             .setNegativeButton(
                 "Cancel"
@@ -173,14 +176,17 @@ class MainActivity : AppCompatActivity() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (sharedPreferences.getString(getString(R.string.sp_item_type), "numeric")
+        if (sharedPreferences.getString(
+                getString(R.string.sp_item_type),
+                getString(R.string.default_item_type)
+            )
                 .equals("numeric")
         ) {
-            manualG.editText.inputType = InputType.TYPE_CLASS_NUMBER
+            manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
-        manualG.editText.addTextChangedListener(
+        manualG.edit.addTextChangedListener(
             getManualAddTextWatcher(
-                manualG.editText,
+                manualG.edit,
                 okButton
             )
         )
@@ -202,10 +208,6 @@ class MainActivity : AppCompatActivity() {
                 addManually()
                 true
             }
-            R.id.action_send -> {
-                emailData()
-                true
-            }
             R.id.action_clear -> {
                 askToClearIds()
                 true
@@ -223,30 +225,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var launchActivityForResult =
-        /**
-         * On Activity result
-         * From settings, update the regex splitting of the cells.
-         */
-        registerForActivityResult(StartActivityForResult()) {
-            adapter.splitRegex = getSplitRegex()
-            adapter.notifyDataSetChanged()
-        }
-
     /**
      * Initiate a scan
      */
     private fun initiateScan() {
-        // set up regex
-        val matchRegexEnable =
-            sharedPreferences.getBoolean(getString(R.string.sp_match_regex_enable), true)
-        val matchRegexString = sharedPreferences.getString(
-            getString(R.string.sp_match_regex_string),
-            getString(R.string.default_regex_string)
-        )
-        regexOptions =
-            if (matchRegexEnable && matchRegexString != null) EnabledRegex(matchRegexString) else DisabledRegex()
-
         val integrator = IntentIntegrator(this)
         integrator.setPrompt("Press back to finish")
         integrator.setOrientationLocked(true)
@@ -256,33 +238,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Email the data in the adapter
+     * Export a CSV to another app
      */
-    private fun emailData() {
-        val address: String?
-        val subject: String?
-        if (this::sharedPreferences.isInitialized) {
-            address = sharedPreferences.getString(getString(R.string.sp_email_address), null)
-            subject = sharedPreferences.getString(
-                getString(R.string.sp_email_subject),
-                getString(R.string.default_email_subject)
-            )
-        } else {
-            address = null
-            subject = null
-        }
-        sendEmail(this, adapter.itemList, address, subject)
-    }
-
     private fun export() {
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, listToEmailString(adapter.itemList))
-            type = "text/plain"
+        // Delete old files
+        filesDir.listFiles()?.forEach {
+            it.delete()
         }
+        // Make new file
+        val file = File(filesDir, sharedPreferences.getExportFileName(this) + ".csv")
+        val fileWriter = FileWriter(file)
+        val csvPrinter = getHeaderStrings()?.toTypedArray()?.let {
+            CSVPrinter(
+                fileWriter,
+                CSVFormat.Builder.create().setHeader(*it).setAllowMissingColumnNames(true)
+                    .build()
+            )
+        } ?: run {
+            CSVPrinter(fileWriter, CSVFormat.DEFAULT)
+        }
+        val splitRegex = adapter.splitRegex
 
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        startActivity(shareIntent)
+        // Write file with csvPrinter
+        adapter.itemList.forEach {
+            csvPrinter.printRecord(splitRegex.split(it.dataString))
+        }
+        fileWriter.close()
+
+        // Send file
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.putExtra(
+            Intent.EXTRA_STREAM,
+            FileProvider.getUriForFile(this, "com.multiQR.FileProvider", file)
+        );
+        intent.type = "text/csv";
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(intent)
     }
 
     /**
@@ -290,8 +281,7 @@ class MainActivity : AppCompatActivity() {
      * @param item the Id object to add
      */
     private fun addItem(item: Item) {
-        adapter.addItem(item)
-        mutateData()
+        mutateData { adapter.addItem(item) }
     }
 
     /**
@@ -299,14 +289,14 @@ class MainActivity : AppCompatActivity() {
      * @param item The Id object to remove
      */
     internal fun removeItem(item: Item) {
-        adapter.removeItem(item)
-        mutateData()
+        mutateData { adapter.removeItem(item) }
     }
 
     /**
      * Save the current adapter information to the persistent data storage
      */
-    internal fun mutateData() {
+    internal fun mutateData(run: () -> Unit) {
+        run()
         saveData(adapter.itemList, sharedPreferences, getString(R.string.sp_items))
         g.toolbarLayout.title = getTitleString()
     }
@@ -349,26 +339,36 @@ class MainActivity : AppCompatActivity() {
      * Get the results
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null) {
-            if (result.contents == null) {
-                // User cancelled
-            } else {
+        IntentIntegrator.parseActivityResult(requestCode, resultCode, data)?.let { result ->
+            // If user didn't cancel, there will be contents
+            result.contents?.let { contents ->
                 beep()
-                val output = result.contents
-                if (regexOptions.passes(output)) {
+                val output = contents.filterNot { it == '\n' }.filterNot { it == '\r' }
+                if (matchRegex.passes(output)) {
                     addItem(Item(output))
                     if (batchScanEnabled()) {
                         initiateScan()
                     }
                 } else {
-                    showMatchFailureDialog(output, (regexOptions as EnabledRegex).regex)
+                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex)
                 }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
+        } ?: super.onActivityResult(requestCode, resultCode, data)
     }
+
+    var launchActivityForResult =
+        /**
+         * On Activity result
+         * From settings, update the regex splitting of the cells.
+         */
+        registerForActivityResult(StartActivityForResult()) {
+            // set up regex
+            matchRegex = sharedPreferences.getMatchRegex(this)
+            populateHeader()
+            adapter.splitRegex = adapter.splitRegex
+            adapter.notifyDataSetChanged()
+        }
+
 
     /**
      * @return Whether batch scanning is enabled

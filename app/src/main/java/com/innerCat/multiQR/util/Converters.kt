@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.util
 
 import com.innerCat.multiQR.Item
@@ -33,10 +30,3 @@ fun listToEmailString(list: List<Item>): String {
     }
 }
 
-fun stringToList(str: String): ArrayList<Item> {
-    return if (str.isEmpty()) {
-        ArrayList()
-    } else {
-        ArrayList(str.split(",").map{ Item(it)})
-    }
-}

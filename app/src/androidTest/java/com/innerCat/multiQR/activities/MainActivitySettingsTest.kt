@@ -45,7 +45,7 @@ isDisplayed()))
         actionMenuItemView.perform(click())
 
         val appCompatEditText = onView(
-allOf(withId(R.id.editText),
+allOf(withId(R.id.edit),
 childAtPosition(
 childAtPosition(
 withId(R.id.custom),

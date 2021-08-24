@@ -1,6 +1,3 @@
-/**
- * @author Isaac Young
- */
 package com.innerCat.multiQR.util
 
 interface OptionalRegex {
