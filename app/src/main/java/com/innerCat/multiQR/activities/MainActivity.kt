@@ -149,6 +149,9 @@ class MainActivity : AppCompatActivity() {
      * Manually add an entry
      */
     private fun addManually() {
+        if (checkShowLimitDialog() == false) {
+            return
+        }
         // Use the Builder class for convenient dialog construction
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
         val manualG: ManualInputBinding = ManualInputBinding.inflate(layoutInflater)
@@ -226,9 +229,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Check if we have reached the limit of adding items, and if so, show a dialog
+     */
+    private fun checkShowLimitDialog(): Boolean {
+        if (adapter.itemList.size >= resources.getInteger(R.integer.max_items_limit)) {
+            // Use the Builder class for convenient dialog construction
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
+            builder.setTitle("Item Limit Reached")
+                .setMessage("Sorry, you can only add up to 50 items. An update will be released later, which will allow adding of unlimited items.")
+                .setPositiveButton(
+                    "Ok"
+                ) { _: DialogInterface?, _: Int ->
+                }
+            val dialog = builder.create()
+            dialog.show()
+            return false
+        }
+        return true
+    }
+
+    /**
      * Initiate a scan
      */
     private fun initiateScan() {
+        if (checkShowLimitDialog() == false) {
+            return
+        }
         val integrator = IntentIntegrator(this)
         integrator.setPrompt("Press back to finish")
         integrator.setOrientationLocked(true)
