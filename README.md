@@ -17,7 +17,7 @@ The MultiQR App allows you to easily manage signing in a variety of QR codes suc
 
 <p float="left">
   <img src="readMeImages/home_screen.png"  width="216" height="432">
-  <img src="readMeImages/email_results.png"  width="216" height="432">
+  <img src="readMeImages/share_sheet.png"  width="216" height="432">
   <img src="readMeImages/final_email.png"  width="216" height="432">
  </p>
  <p float="left">
