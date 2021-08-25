@@ -6,11 +6,10 @@ The MultiQR App allows you to easily manage signing in a variety of QR codes suc
 <img src="readMeImages/scan.png"  width="150" height="290">
 
 # Features 
-- Add Student IDs from QR Code
-- Add Student IDs manually
-- Edit/Delete Student IDs
-- Default email address
-- Default email subject (Use keyword "$date" to insert the date and time)
+- Add entries from QR Code
+- Add entries IDs manually
+- Edit/Delete entries
+- Set CSV filename (Use keyword "$date" to insert the date and time)
 - Regex matching for checking validity of QR codes
 - Automatic saving of previous entries
 - Bulk entry clearing
