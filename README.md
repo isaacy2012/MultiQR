@@ -1,7 +1,7 @@
 # <img src="readMeImages/ic_logo.png"  width="25" height="25">  MultiQR
 ## By Isaac Young
 
-The MultiQR App allows you to easily manage signing in a variety of QR codes such as user ID's. Quickly construct lists of inputs to speed up your projects and events.
+The MultiQR App allows you to easily batch scan QR codes and export the data as a ```.csv```. Quickly construct lists of inputs to speed up your projects and events.
 
 <img src="readMeImages/scan.png"  width="150" height="290">
 
