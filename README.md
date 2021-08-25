@@ -17,7 +17,7 @@ The MultiQR App allows you to easily batch scan QR codes and export the data as 
 <p float="left">
   <img src="readMeImages/home_screen.png"  width="216" height="432">
   <img src="readMeImages/share_sheet.png"  width="216" height="432">
-  <img src="readMeImages/final_email.png"  width="216" height="432">
+  <img src="readMeImages/email.png"  width="216" height="432">
  </p>
  <p float="left">
   <img src="readMeImages/settings_screen.png"  width="216" height="432">
