@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                 if (matchRegex.passes(output)) {
                     addItem(Item(output))
                 } else {
-                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex)
+                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex) {} // don't do anything else when manual add
                 }
             }
             .setNegativeButton(
@@ -332,7 +332,7 @@ class MainActivity : AppCompatActivity() {
      * @param output the string that failed to match
      * @param regex the regex
      */
-    private fun showMatchFailureDialog(output: String, regex: Regex) {
+    private fun showMatchFailureDialog(output: String, regex: Regex, onComplete: () -> Unit) {
         val builder =
             MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded)
         val ssb = SpannableStringBuilder()
@@ -350,12 +350,12 @@ class MainActivity : AppCompatActivity() {
                 "Add"
             ) { _: DialogInterface?, _: Int ->
                 addItem(Item(output))
-                initiateScan()
+                onComplete()
             }
             .setNegativeButton(
                 "Discard"
             ) { _: DialogInterface?, _: Int ->
-                initiateScan()
+                onComplete()
             }
         val dialog = builder.create()
         dialog.show()
@@ -376,7 +376,9 @@ class MainActivity : AppCompatActivity() {
                         initiateScan()
                     }
                 } else {
-                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex)
+                    showMatchFailureDialog(
+                        output, (matchRegex as EnabledRegex).regex
+                    ) { initiateScan() }
                 }
             }
         } ?: super.onActivityResult(requestCode, resultCode, data)

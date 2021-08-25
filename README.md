@@ -3,9 +3,7 @@
 
 The MultiQR App allows you to easily manage signing in a variety of QR codes such as user ID's. Quickly construct lists of inputs to speed up your projects and events.
 
-<img src="readMeImages/main.png"  width="150" height="290">
-
-
+<img src="readMeImages/scan.png"  width="150" height="290">
 
 # Features 
 - Add Student IDs from QR Code
