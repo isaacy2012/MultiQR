@@ -167,7 +167,10 @@ class MainActivity : AppCompatActivity() {
                 if (matchRegex.passes(output)) {
                     addItem(Item(output))
                 } else {
-                    showMatchFailureDialog(output, (matchRegex as EnabledRegex).regex) {} // don't do anything else when manual add
+                    showMatchFailureDialog(
+                        output,
+                        (matchRegex as EnabledRegex).regex
+                    ) {} // don't do anything else when manual add
                 }
             }
             .setNegativeButton(
@@ -378,7 +381,11 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     showMatchFailureDialog(
                         output, (matchRegex as EnabledRegex).regex
-                    ) { initiateScan() }
+                    ) {
+                        if (batchScanEnabled()) {
+                            initiateScan()
+                        }
+                    }
                 }
             }
         } ?: super.onActivityResult(requestCode, resultCode, data)
