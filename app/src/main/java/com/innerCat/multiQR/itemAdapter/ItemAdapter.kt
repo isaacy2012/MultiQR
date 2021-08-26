@@ -1,22 +1,28 @@
 package com.innerCat.multiQR.itemAdapter
 
 import android.content.Context
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.innerCat.multiQR.Item
+import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
-import com.innerCat.multiQR.databinding.MainRvItemBinding
 import com.innerCat.multiQR.assertions.assert
+import com.innerCat.multiQR.databinding.MainRvItemBinding
 import com.innerCat.multiQR.fragments.MasterFragment
 import com.innerCat.multiQR.fragments.MasterFragmentDirections
-import com.innerCat.multiQR.util.OptionalRegex
 import com.innerCat.multiQR.views.CellView
-import java.lang.RuntimeException
+import com.innerCat.multiQR.views.makeMoreHorizontal
+import java.lang.Integer.min
 import java.util.*
 
+
+val MAX_COLS = 3
 
 class ItemsNotUniqueException : RuntimeException()
 /**
@@ -128,10 +134,17 @@ class ItemAdapter(
         holder.item = items[position]
         val g: MainRvItemBinding = holder.g
         g.root.removeAllViews()
-        holder.item.strList.forEach {
-            val cell = CellView(holder.context, it)
+        for (i in 0 until min(MAX_COLS, holder.item.strList.size)) {
+            val cell = CellView(holder.context, holder.item.strList[i])
             g.root.addView(cell)
         }
+        if (holder.item.strList.size >= MAX_COLS) {
+            g.root.addView(makeMoreHorizontal(holder.context))
+        }
+//        holder.item.strList.forEach {
+//            val cell = CellView(holder.context, it)
+//            g.root.addView(cell)
+//        }
     }
 
     /**

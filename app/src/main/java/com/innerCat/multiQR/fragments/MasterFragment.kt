@@ -10,6 +10,7 @@ import android.os.Looper
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
+import android.view.View.INVISIBLE
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -27,12 +28,15 @@ import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.factories.itemAdapterFromList
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.itemAdapter.ItemsNotUniqueException
+import com.innerCat.multiQR.itemAdapter.MAX_COLS
 import com.innerCat.multiQR.util.*
 import com.innerCat.multiQR.views.HeaderTextView
+import com.innerCat.multiQR.views.makeMoreHorizontal
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import java.io.File
 import java.io.FileWriter
+import java.lang.Integer.min
 
 class MasterFragment : MainActivityFragment() {
 
@@ -96,10 +100,19 @@ class MasterFragment : MainActivityFragment() {
      */
     private fun populateHeader() {
         g.headerLayout.removeAllViews()
-        getHeaderStrings()?.forEach {
-            val spacedTextView = HeaderTextView(requireActivity(), it)
-            g.headerLayout.addView(spacedTextView)
+        getHeaderStrings()?.let {
+            for (i in 0 until min(MAX_COLS, it.size)) {
+                val spacedTextView = HeaderTextView(requireActivity(), it[i])
+                g.headerLayout.addView(spacedTextView)
+            }
+            if (it.size >= MAX_COLS) {
+                g.headerLayout.addView(makeMoreHorizontal(mainActivity).apply {visibility = INVISIBLE})
+            }
         }
+//        getHeaderStrings()?.forEach {
+//            val spacedTextView = HeaderTextView(requireActivity(), it)
+//            g.headerLayout.addView(spacedTextView)
+//        }
     }
 
     private fun getHeaderStrings(): List<String>? {
