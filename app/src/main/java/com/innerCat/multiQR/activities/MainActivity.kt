@@ -1,5 +1,6 @@
 package com.innerCat.multiQR.activities
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -83,6 +84,18 @@ class MainActivity : AppCompatActivity() {
             }
             else -> {
                 "$count items"
+            }
+        }
+    }
+
+    /**
+     * TODO Replace with new way
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.fragments?.let {
+            it.forEach { fragment ->
+                fragment.onActivityResult(requestCode, resultCode, data)
             }
         }
     }

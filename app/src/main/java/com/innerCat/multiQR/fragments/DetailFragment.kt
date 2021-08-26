@@ -19,9 +19,9 @@ import com.innerCat.multiQR.databinding.FragmentDetailBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.cellAdapterFromList
 import com.innerCat.multiQR.factories.emptyCellAdapter
+import com.innerCat.multiQR.factories.getAttrColor
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.strAdapter.CellAdapter
-import com.innerCat.multiQR.util.fromDpToPixels
 import com.innerCat.multiQR.util.getItemType
 
 class DetailFragment : MainActivityFragment() {
@@ -189,19 +189,24 @@ class DetailFragment : MainActivityFragment() {
                 isCurrentlyActive: Boolean
             ) {
                 var scale = 1.0f
-                var z = 0f
                 if (isCurrentlyActive) {
-                    scale = 1.025f
-                    z = fromDpToPixels(3, resources)
+                    scale = 1.02f
                 }
                 val dur = resources.getInteger(R.integer.ith_animation_duration).toLong()
 
                 val cardView: CardView = viewHolder.itemView.findViewById(R.id.cardView)
-                cardView.animate().apply {duration = dur}.z(z)
-                cardView.animate().apply {duration = dur}.z(z)
-
                 cardView.animate().apply {duration = dur}.scaleX(scale)
                 cardView.animate().apply {duration = dur}.scaleY(scale)
+
+                if (isCurrentlyActive) {
+                    context?.let {
+                        cardView.setCardBackgroundColor(getAttrColor(it, R.attr.colorOnCardDark))
+                    }
+                } else {
+                    context?.let {
+                        cardView.setCardBackgroundColor(getAttrColor(it, R.attr.colorOnCard))
+                    }
+                }
 //                cardView.animate().scaleY(end)
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }

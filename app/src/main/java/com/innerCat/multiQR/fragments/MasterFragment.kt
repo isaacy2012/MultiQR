@@ -363,6 +363,7 @@ class MasterFragment : MainActivityFragment() {
         dialog.show()
     }
 
+
     /**
      * Get the results
      */

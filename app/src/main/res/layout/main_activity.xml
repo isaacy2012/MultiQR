@@ -5,6 +5,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="vertical">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -58,6 +60,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.fragment.app.FragmentContainerView
@@ -65,6 +69,8 @@
                 android:name="androidx.navigation.fragment.NavHostFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 app:defaultNavHost="true"
                 app:navGraph="@navigation/nav_graph" />
         </LinearLayout>
