@@ -1,16 +1,12 @@
 package com.innerCat.multiQR.itemAdapter
 
 import android.content.Context
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.innerCat.multiQR.Item
-import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.assertions.assert
 import com.innerCat.multiQR.databinding.MainRvItemBinding

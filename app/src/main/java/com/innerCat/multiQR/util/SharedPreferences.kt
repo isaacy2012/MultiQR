@@ -43,3 +43,13 @@ fun SharedPreferences.getMatchRegex(context: Context): OptionalRegex {
     )
     return if (matchRegexEnable && matchRegexString != null) EnabledRegex(matchRegexString) else DisabledRegex()
 }
+
+/**
+ * Get the item type from sharedPreferences
+ */
+fun SharedPreferences.getItemType(context: Context): String? {
+    return getString(
+        context.getString(R.string.sp_item_type),
+        context.getString(R.string.default_item_type)
+    )
+}

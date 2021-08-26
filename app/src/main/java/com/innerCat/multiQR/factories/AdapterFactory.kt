@@ -4,9 +4,8 @@ import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.fragments.DetailFragment
 import com.innerCat.multiQR.fragments.MasterFragment
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
-import com.innerCat.multiQR.itemAdapter.ItemsNotUniqueException
 import com.innerCat.multiQR.strAdapter.CellAdapter
-import java.util.ArrayList
+import java.util.*
 
 
 
@@ -26,7 +25,7 @@ fun MasterFragment.itemAdapterFromList(list: MutableList<Item>): ItemAdapter {
  * @return the str adapter
  */
 fun DetailFragment.emptyCellAdapter(): CellAdapter {
-    return CellAdapter(ArrayList())
+    return CellAdapter(this, ArrayList())
 }
 
 
@@ -36,6 +35,6 @@ fun DetailFragment.emptyCellAdapter(): CellAdapter {
  * @return the str adapter
  */
 fun DetailFragment.cellAdapterFromList(list: MutableList<String>): CellAdapter {
-    return CellAdapter(list)
+    return CellAdapter(this, list)
 }
 

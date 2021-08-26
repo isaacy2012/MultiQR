@@ -9,7 +9,6 @@ import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.State
 import com.innerCat.multiQR.databinding.FragmentDetailBinding
@@ -18,17 +17,16 @@ import com.innerCat.multiQR.factories.cellAdapterFromList
 import com.innerCat.multiQR.factories.emptyCellAdapter
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.strAdapter.CellAdapter
-import com.innerCat.multiQR.util.EnabledRegex
-import java.util.*
+import com.innerCat.multiQR.util.getItemType
 
 class DetailFragment : MainActivityFragment() {
 
     private lateinit var g: FragmentDetailBinding
     private lateinit var adapter: CellAdapter
     private val index: Int
-    get() {
-        return requireArguments().getInt("index")
-    }
+        get() {
+            return requireArguments().getInt("index")
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,11 +104,9 @@ class DetailFragment : MainActivityFragment() {
 
         builder.setTitle("Add Item")
             .setView(manualG.root)
-            .setPositiveButton(
-                "Ok"
-            ) { _: DialogInterface?, _: Int ->
+            .setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
                 val output = manualG.edit.text.toString()
-                mainActivity.mutateData{adapter.addString(output)}
+                mainActivity.mutateData { adapter.addString(output) }
             }
             .setNegativeButton(
                 "Cancel"
@@ -121,12 +117,7 @@ class DetailFragment : MainActivityFragment() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (mainActivity.sharedPreferences.getString(
-                getString(R.string.sp_item_type),
-                getString(R.string.default_item_type)
-            )
-                .equals("numeric")
-        ) {
+        if (mainActivity.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
             manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
         manualG.edit.addTextChangedListener(

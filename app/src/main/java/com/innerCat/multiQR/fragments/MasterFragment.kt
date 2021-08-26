@@ -170,9 +170,7 @@ class MasterFragment : MainActivityFragment() {
 
         builder.setTitle("Add Item")
             .setView(manualG.root)
-            .setPositiveButton(
-                "Ok"
-            ) { _: DialogInterface?, _: Int ->
+            .setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
                 val output = manualG.edit.text.toString()
                 if (matchRegex.passes(output)) {
                     addItem(Item(output, splitRegex))
@@ -192,12 +190,7 @@ class MasterFragment : MainActivityFragment() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (mainActivity.sharedPreferences.getString(
-                getString(R.string.sp_item_type),
-                getString(R.string.default_item_type)
-            )
-                .equals("numeric")
-        ) {
+        if (mainActivity.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
             manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
         manualG.edit.addTextChangedListener(
