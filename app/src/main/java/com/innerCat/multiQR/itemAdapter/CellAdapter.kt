@@ -148,8 +148,8 @@ class CellAdapter(
         // Get the data model based on position
         holder.str = strs[position]
         val g: MainRvItemBinding = holder.g
+        g.root.removeAllViews()
         g.root.addView(CellView(holder.context, holder.str))
-//        g.root.removeAllViews()
 //        holder.str.forEach {
 //            val cell = CellView(holder.context, it)
 //            g.root.addView(cell)
