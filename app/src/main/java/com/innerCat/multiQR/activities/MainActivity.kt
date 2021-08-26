@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ItemAdapter
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var matchRegex: OptionalRegex
+    lateinit var splitRegex: OptionalRegex
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,18 +60,15 @@ class MainActivity : AppCompatActivity() {
         val items = loadData(this, sharedPreferences)
         adapter = if (items.isEmpty() == false) {
             itemAdapterFromList(
-                this,
-                sharedPreferences.getSplitRegex(this),
                 items
             )
         } else {
-            emptyItemAdapter(this)
+            emptyItemAdapter()
         }
         g.toolbarLayout.title = getTitleString()
 
         // Attach the adapter to the recyclerview to populate items
         g.rvItems.adapter = adapter
-        adapter.notifyDataSetChanged()
         // Set layout manager to position the items
         g.rvItems.layoutManager = LinearLayoutManager(this)
 
@@ -78,8 +76,14 @@ class MainActivity : AppCompatActivity() {
             initiateScan()
         }
 
+        refresh()
+    }
+
+    private fun refresh() {
         matchRegex = sharedPreferences.getMatchRegex(this)
-        populateHeader();
+        splitRegex = sharedPreferences.getSplitRegex(this)
+        populateHeader()
+        adapter.refreshAll(splitRegex)
     }
 
     /**
@@ -99,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         if (headerString == null || headerString == "") {
             return null
         }
-        return adapter.splitRegex.split(headerString)
+        return splitRegex.split(headerString)
     }
 
 
@@ -165,7 +169,7 @@ class MainActivity : AppCompatActivity() {
             ) { _: DialogInterface?, _: Int ->
                 val output = manualG.edit.text.toString()
                 if (matchRegex.passes(output)) {
-                    addItem(Item(output))
+                    addItem(Item(output, splitRegex))
                 } else {
                     showMatchFailureDialog(
                         output,
@@ -286,11 +290,10 @@ class MainActivity : AppCompatActivity() {
         } ?: run {
             CSVPrinter(fileWriter, CSVFormat.DEFAULT)
         }
-        val splitRegex = adapter.splitRegex
 
         // Write file with csvPrinter
         adapter.itemList.forEach {
-            csvPrinter.printRecord(splitRegex.split(it.dataString))
+            csvPrinter.printRecord(it.strList)
         }
         fileWriter.close()
 
@@ -352,7 +355,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(
                 "Add"
             ) { _: DialogInterface?, _: Int ->
-                addItem(Item(output))
+                addItem(Item(output, splitRegex))
                 onComplete()
             }
             .setNegativeButton(
@@ -374,7 +377,7 @@ class MainActivity : AppCompatActivity() {
                 beep()
                 val output = contents.filterNot { it == '\n' }.filterNot { it == '\r' }
                 if (matchRegex.passes(output)) {
-                    addItem(Item(output))
+                    addItem(Item(output, splitRegex))
                     if (batchScanEnabled()) {
                         initiateScan()
                     }
@@ -398,10 +401,7 @@ class MainActivity : AppCompatActivity() {
          */
         registerForActivityResult(StartActivityForResult()) {
             // set up regex
-            matchRegex = sharedPreferences.getMatchRegex(this)
-            populateHeader()
-            adapter.splitRegex = adapter.splitRegex
-            adapter.notifyDataSetChanged()
+            refresh()
         }
 
 

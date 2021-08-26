@@ -36,7 +36,7 @@ fun SharedPreferences.getSplitRegex(context: Context): OptionalRegex {
  */
 fun SharedPreferences.getMatchRegex(context: Context): OptionalRegex {
     val matchRegexEnable =
-        getBoolean(context.getString(R.string.sp_match_regex_enable), true)
+        getBoolean(context.getString(R.string.sp_match_regex_enable), false)
     val matchRegexString = getString(
         context.getString(R.string.sp_match_regex_string),
         context.getString(R.string.default_regex_string)

@@ -13,11 +13,11 @@ import java.util.ArrayList
  *
  * @return the item adapter
  */
-fun emptyItemAdapter(context: Context): ItemAdapter {
-    return ItemAdapter(DisabledRegex(), ArrayList())
+fun emptyItemAdapter(): ItemAdapter {
+    return ItemAdapter(ArrayList())
 }
 
-fun itemAdapterFromList(context: Context, splitRegex: OptionalRegex, list: MutableList<Item>): ItemAdapter {
-    return ItemAdapter(splitRegex, list)
+fun itemAdapterFromList(list: MutableList<Item>): ItemAdapter {
+    return ItemAdapter(list)
 }
 

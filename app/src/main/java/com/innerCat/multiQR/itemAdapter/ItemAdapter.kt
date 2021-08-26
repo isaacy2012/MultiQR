@@ -24,7 +24,6 @@ import java.util.*
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
-    var splitRegex: OptionalRegex,
     items: MutableList<Item>
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
@@ -82,8 +81,9 @@ class ItemAdapter(
                 .setPositiveButton(
                     "Ok"
                 ) { _: DialogInterface?, _: Int ->
-                    item.dataString = manualG.edit.text.toString()
+                    item.setDataString(manualG.edit.text.toString(), (context as MainActivity).splitRegex)
                     notifyItemChanged(items.indexOf(item))
+                    println("WINNOW " + item.toString())
                     (context as MainActivity).mutateData{}
                 }
                 .setNegativeButton("Cancel") { _: DialogInterface?, _: Int ->
@@ -131,6 +131,17 @@ class ItemAdapter(
     }
 
     /**
+     * Refresh all the items with the new splitRegex
+     * @param splitRegex the regex to split the item's dataString with
+     */
+    fun refreshAll(splitRegex: OptionalRegex) {
+        items.forEach {
+            it.updateRegex(splitRegex)
+        }
+        notifyDataSetChanged()
+    }
+
+    /**
      * Remove an item.
      *
      * @param item     the item to remove
@@ -157,8 +168,7 @@ class ItemAdapter(
         holder.item = items[position]
         val g: MainRvItemBinding = holder.g
         g.root.removeAllViews()
-        val arr = splitRegex.split(holder.item.dataString)
-        arr.forEach {
+        holder.item.strList.forEach {
             val cell = CellView(holder.context, it)
             g.root.addView(cell)
         }
