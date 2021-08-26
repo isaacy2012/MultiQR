@@ -3,5 +3,8 @@
         <attr name="appWidgetBackgroundColor" format="color" />
         <attr name="appWidgetTextColor" format="color" />
     </declare-styleable>
+    <attr format="color" name="colorOnCard"/>
+    <attr format="color" name="colorOnCardSelected"/>
+    <attr format="color" name="colorOnToolbar"/>
 
 </resources>

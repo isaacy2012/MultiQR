@@ -11,6 +11,7 @@ import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
+import com.innerCat.multiQR.dp
 import com.innerCat.multiQR.factories.getSharedPreferences
 import com.innerCat.multiQR.util.loadData
 import com.innerCat.multiQR.util.saveData
@@ -63,9 +64,9 @@ class MainActivity : AppCompatActivity() {
      * Save the current adapter information to the persistent data storage
      */
     fun mutateData(run: () -> Unit) {
-        println("WINNOW BEFORE " + items)
+        dp{println("BEFORE " + items)}
         run()
-        println("WINNOW AFTER" + items)
+        dp{println("AFTER" + items)}
         saveData(items, sharedPreferences, getString(R.string.sp_items))
         g.toolbarLayout.title = getTitleString()
     }

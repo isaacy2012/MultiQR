@@ -200,7 +200,7 @@ class DetailFragment : MainActivityFragment() {
 
                 if (isCurrentlyActive) {
                     context?.let {
-                        cardView.setCardBackgroundColor(getAttrColor(it, R.attr.colorOnCardDark))
+                        cardView.setCardBackgroundColor(getAttrColor(it, R.attr.colorOnCardSelected))
                     }
                 } else {
                     context?.let {
