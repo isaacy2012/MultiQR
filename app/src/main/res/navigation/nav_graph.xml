@@ -24,8 +24,8 @@
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" >
         <argument
-            android:name="strToPrint"
-            app:argType="string"
+            android:name="index"
+            app:argType="integer"
         />
     </fragment>
 

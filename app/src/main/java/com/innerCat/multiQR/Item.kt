@@ -14,7 +14,7 @@ class Item(private var _dataString: String, splitRegex: OptionalRegex) {
     }
 
 
-    var strList: List<String>
+    var strList: MutableList<String>
 
     init {
         strList = splitRegex.split(dataString)

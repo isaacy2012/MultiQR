@@ -2,8 +2,6 @@ package com.innerCat.multiQR
 
 import com.google.gson.Gson
 import com.innerCat.multiQR.util.EnabledRegex
-import com.innerCat.multiQR.util.listToString
-import com.innerCat.multiQR.util.write
 import org.junit.Test
 
 import org.junit.Assert.*

@@ -13,7 +13,6 @@ import android.text.SpannableStringBuilder
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.core.text.bold
@@ -26,12 +25,14 @@ import com.innerCat.multiQR.activities.CaptureActivityPortrait
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.activities.SettingsActivity
 import com.innerCat.multiQR.databinding.FragmentMasterBinding
+import com.innerCat.multiQR.databinding.MainActivityBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.emptyItemAdapter
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.factories.getSharedPreferences
 import com.innerCat.multiQR.factories.itemAdapterFromList
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
+import com.innerCat.multiQR.itemAdapter.ItemsNotUniqueException
 import com.innerCat.multiQR.util.*
 import com.innerCat.multiQR.views.HeaderTextView
 import org.apache.commons.csv.CSVFormat
@@ -39,47 +40,28 @@ import org.apache.commons.csv.CSVPrinter
 import java.io.File
 import java.io.FileWriter
 
-class MasterFragment : Fragment() {
+class MasterFragment : MainActivityFragment() {
 
     private lateinit var g: FragmentMasterBinding
     private lateinit var adapter: ItemAdapter
-    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var matchRegex: OptionalRegex
     lateinit var splitRegex: OptionalRegex
-    
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        super.onCreate(savedInstanceState)
+        super.onCreateView(inflater, container, savedInstanceState)
         g = FragmentMasterBinding.inflate(layoutInflater)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(g.toolbar)
         setHasOptionsMenu(true)
 
-        getSharedPreferences(requireActivity())?.let {
-            sharedPreferences = it
-        }
+        setRecyclerViewAdapter()
 
-        // Create adapter from sharedPreferences
-        val items = loadData(requireActivity(), sharedPreferences)
-        adapter = if (items.isEmpty() == false) {
-            itemAdapterFromList(
-                items
-            )
-        } else {
-            emptyItemAdapter()
-        }
-        g.toolbarLayout.title = getTitleString()
+        mainG.toolbarLayout.title = getTitleString()
 
-        // Attach the adapter to the recyclerview to populate items
-        g.rvItems.adapter = adapter
-        // Set layout manager to position the items
-        g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
-
-        (requireActivity() as MainActivity).g.fab.setOnClickListener {
-            println("WINNOW TRIED")
+        mainG.fab.text = getString(R.string.fab_scan_item)
+        mainG.fab.setOnClickListener {
             initiateScan()
         }
 
@@ -88,15 +70,41 @@ class MasterFragment : Fragment() {
         return g.root
     }
 
+    /**
+     * Set the recyclerview Adapter
+     */
+    private fun setRecyclerViewAdapter() {
+        // Create adapter from mainActivity.sharedPreferences
+        adapter =
+            if (mainActivity.items.isEmpty() == false) {
+                try {
+                    itemAdapterFromList(
+                        mainActivity.items
+                    )
+                } catch (e: ItemsNotUniqueException) {
+                    mainActivity.items = ArrayList(HashSet(mainActivity.items))
+                    itemAdapterFromList(
+                        mainActivity.items
+                    )
+                }
+            } else {
+                emptyItemAdapter()
+            }
+        // Attach the adapter to the recyclerview to populate items
+        g.rvItems.adapter = adapter
+        // Set layout manager to position the items
+        g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
+    }
+
     private fun refresh() {
-        matchRegex = sharedPreferences.getMatchRegex(requireActivity())
-        splitRegex = sharedPreferences.getSplitRegex(requireActivity())
+        matchRegex = mainActivity.sharedPreferences.getMatchRegex(requireActivity())
+        splitRegex = mainActivity.sharedPreferences.getSplitRegex(requireActivity())
         populateHeader()
         adapter.refreshAll(splitRegex)
     }
 
     /**
-     * Populate the table header from sharedPreferences
+     * Populate the table header from mainActivity.sharedPreferences
      */
     private fun populateHeader() {
         g.headerLayout.removeAllViews()
@@ -108,7 +116,10 @@ class MasterFragment : Fragment() {
 
     private fun getHeaderStrings(): List<String>? {
         val headerString =
-            sharedPreferences.getString(getString(R.string.sp_column_headers_string), null)
+            mainActivity.sharedPreferences.getString(
+                getString(R.string.sp_column_headers_string),
+                null
+            )
         if (headerString == null || headerString == "") {
             return null
         }
@@ -149,7 +160,7 @@ class MasterFragment : Fragment() {
                 "Delete"
             ) { _: DialogInterface?, _: Int ->
                 adapter.reset()
-                clearData(sharedPreferences, getString(R.string.sp_items))
+                clearData(mainActivity.sharedPreferences, getString(R.string.sp_items))
             }
             .setNegativeButton(
                 "Cancel"
@@ -166,7 +177,8 @@ class MasterFragment : Fragment() {
             return
         }
         // Use the Builder class for convenient dialog construction
-        val builder = MaterialAlertDialogBuilder(requireActivity(),
+        val builder = MaterialAlertDialogBuilder(
+            requireActivity(),
             R.style.MaterialAlertDialog_Rounded
         )
         val manualG: ManualInputBinding = ManualInputBinding.inflate(layoutInflater)
@@ -197,7 +209,7 @@ class MasterFragment : Fragment() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (sharedPreferences.getString(
+        if (mainActivity.sharedPreferences.getString(
                 getString(R.string.sp_item_type),
                 getString(R.string.default_item_type)
             )
@@ -251,7 +263,8 @@ class MasterFragment : Fragment() {
     private fun checkShowLimitDialog(): Boolean {
         if (adapter.itemList.size >= resources.getInteger(R.integer.max_items_limit)) {
             // Use the Builder class for convenient dialog construction
-            val builder = MaterialAlertDialogBuilder(requireActivity(),
+            val builder = MaterialAlertDialogBuilder(
+                requireActivity(),
                 R.style.MaterialAlertDialog_Rounded
             )
             builder.setTitle("Item Limit Reached")
@@ -292,7 +305,10 @@ class MasterFragment : Fragment() {
             it.delete()
         }
         // Make new file
-        val file = File(filesDir, sharedPreferences.getExportFileName(requireActivity()) + ".csv")
+        val file = File(
+            filesDir,
+            mainActivity.sharedPreferences.getExportFileName(requireActivity()) + ".csv"
+        )
         val fileWriter = FileWriter(file)
         val csvPrinter = getHeaderStrings()?.toTypedArray()?.let {
             CSVPrinter(
@@ -342,8 +358,8 @@ class MasterFragment : Fragment() {
      */
     internal fun mutateData(run: () -> Unit) {
         run()
-        saveData(adapter.itemList, sharedPreferences, getString(R.string.sp_items))
-        g.toolbarLayout.title = getTitleString()
+        saveData(adapter.itemList, mainActivity.sharedPreferences, getString(R.string.sp_items))
+        mainG.toolbarLayout.title = getTitleString()
     }
 
     /**
@@ -422,7 +438,7 @@ class MasterFragment : Fragment() {
      * @return Whether batch scanning is enabled
      */
     private fun batchScanEnabled(): Boolean {
-        return sharedPreferences.getBoolean(getString(R.string.sp_batch_scan), true)
+        return mainActivity.sharedPreferences.getBoolean(getString(R.string.sp_batch_scan), true)
     }
 
     /**

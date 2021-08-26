@@ -1,37 +1,32 @@
 package com.innerCat.multiQR.itemAdapter
 
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.innerCat.multiQR.Item
-import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.databinding.MainRvItemBinding
-import com.innerCat.multiQR.databinding.ManualInputBinding
-import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.assertions.assert
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.innerCat.multiQR.fragments.MasterFragment
 import com.innerCat.multiQR.fragments.MasterFragmentDirections
 import com.innerCat.multiQR.util.OptionalRegex
 import com.innerCat.multiQR.views.CellView
+import java.lang.RuntimeException
 import java.util.*
 
+
+class ItemsNotUniqueException : RuntimeException()
 /**
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
     val fragment: MasterFragment,
-    items: MutableList<Item>
+    private var items: MutableList<Item>
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
-    private var items: MutableList<Item>
     private var itemSet: HashSet<Item>
 
     /**
@@ -41,11 +36,10 @@ class ItemAdapter(
      */
     init {
         // Try to preserve order if there are no duplicates
-        this.items = ArrayList(items)
         this.itemSet = HashSet(items)
         // Otherwise make a new ArrayList from the HashSet
         if (this.items.size != this.itemSet.size) {
-            this.items = ArrayList(itemSet)
+            throw ItemsNotUniqueException()
         }
     }
 
@@ -73,10 +67,12 @@ class ItemAdapter(
          * @param view the itemView
          */
         override fun onClick(view: View) {
+            (context as MainActivity).g.fab.shrink()
             val direction =
                 MasterFragmentDirections.actionMasterFragmentToDetailFragment(
-                    item.dataString
+                    (context as MainActivity).items.indexOf(item)
                 )
+            (context as MainActivity).g.appBarLayout.setExpanded(false)
             view.findNavController().navigate(direction)
         }
 

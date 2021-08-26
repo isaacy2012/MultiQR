@@ -10,7 +10,7 @@ import com.innerCat.multiQR.Item
  *
  * @param list - list to parse
  */
-fun listToString(list: List<Item>): String {
+fun listToString(list: List<Item>): kotlin.String {
     return list.joinToString(","){
         it.dataString
     }
@@ -24,7 +24,7 @@ fun listToString(list: List<Item>): String {
  *
  * @param list - list to parse
  */
-fun listToEmailString(list: List<Item>): String {
+fun listToEmailString(list: List<Item>): kotlin.String {
     return list.joinToString(",\n"){
         it.dataString
     }
