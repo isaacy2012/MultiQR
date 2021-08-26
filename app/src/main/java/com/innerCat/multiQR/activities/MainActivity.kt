@@ -12,6 +12,7 @@ import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
 import com.innerCat.multiQR.factories.getSharedPreferences
 import com.innerCat.multiQR.util.loadData
+import com.innerCat.multiQR.util.saveData
 
 
 enum class State {
@@ -36,7 +37,9 @@ class MainActivity : AppCompatActivity() {
             sharedPreferences = it
         }
         items = loadData(this, sharedPreferences)
+
         g = setContentView(this, R.layout.main_activity)
+        g.toolbarLayout.title = getTitleString()
 
         /**
          * Listener for action bar if expanded
@@ -49,6 +52,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Delete the item at a particular index
+     */
+    fun deleteItemAt(index: Int) {
+        items.removeAt(index)
+    }
+
+    /**
+     * Save the current adapter information to the persistent data storage
+     */
+    fun mutateData(run: () -> Unit) {
+        println("WINNOW BEFORE " + items)
+        run()
+        println("WINNOW AFTER" + items)
+        saveData(items, sharedPreferences, getString(R.string.sp_items))
+        g.toolbarLayout.title = getTitleString()
+    }
+
+    /**
+     * Gets the title string counting how many items there are
+     * @return How many items there are as a formatted string
+     */
+    private fun getTitleString(): String {
+        return when (val count = items.size) {
+            0 -> {
+                "No items"
+            }
+            1 -> {
+                "$count item"
+            }
+            else -> {
+                "$count items"
+            }
+        }
+    }
+
+
+    /**
      * When the back button is pressed
      */
     override fun onBackPressed() {
@@ -59,6 +99,7 @@ class MainActivity : AppCompatActivity() {
                     g.fab.extend()
                 }, resources.getInteger(R.integer.fab_animation_duration).toLong())
                 state = State.MAIN
+                g.appBarLayout.setExpanded(true)
                 super.onBackPressed()
             }
             actionBarExpanded == false -> {

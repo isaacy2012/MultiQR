@@ -17,7 +17,7 @@ class UnitTests {
         val regex = EnabledRegex("\\|")
         val item = Item("Isaac|20|135", regex)
         assertEquals("Isaac|20|135", item.dataString)
-        item.setDataString("Harley|20|136", regex)
+        item.setData("Harley|20|136", regex)
         assertEquals("Harley|20|136", item.dataString)
         assertEquals(mutableListOf("Harley", "20", "136"), item.strList)
         val saveString = Gson().toJson(listOf(item))

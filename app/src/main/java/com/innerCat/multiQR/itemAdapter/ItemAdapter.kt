@@ -24,7 +24,7 @@ class ItemsNotUniqueException : RuntimeException()
  */
 class ItemAdapter(
     val fragment: MasterFragment,
-    private var items: MutableList<Item>
+    private val items: MutableList<Item>
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     private var itemSet: HashSet<Item>
@@ -100,16 +100,6 @@ class ItemAdapter(
         }
     }
 
-    /**
-     * Refresh all the items with the new splitRegex
-     * @param splitRegex the regex to split the item's dataString with
-     */
-    fun refreshAll(splitRegex: OptionalRegex) {
-        items.forEach {
-            it.updateRegex(splitRegex)
-        }
-        notifyDataSetChanged()
-    }
 
     /**
      * Remove an item.

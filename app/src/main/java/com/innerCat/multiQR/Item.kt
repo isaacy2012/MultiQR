@@ -2,29 +2,16 @@ package com.innerCat.multiQR
 
 import com.innerCat.multiQR.util.OptionalRegex
 
-class Item(private var _dataString: String, splitRegex: OptionalRegex) {
-    val dataString: String
-    get() {
-        return _dataString
-    }
+class Item(dataString: String, splitRegex: OptionalRegex) {
 
-    fun setDataString(dataString: String, regex: OptionalRegex) {
-        _dataString = dataString
+    fun setData(dataString: String, regex: OptionalRegex) {
         strList = regex.split(dataString)
     }
-
 
     var strList: MutableList<String>
 
     init {
         strList = splitRegex.split(dataString)
-    }
-
-    /**
-     * Refresh the list with the new regex
-     */
-    fun updateRegex(splitRegex: OptionalRegex) {
-        setDataString(dataString, splitRegex)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -33,16 +20,13 @@ class Item(private var _dataString: String, splitRegex: OptionalRegex) {
 
         other as Item
 
-        if (_dataString != other._dataString) return false
         if (strList != other.strList) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = _dataString.hashCode()
-        result = 31 * result + strList.hashCode()
-        return result
+        return strList.hashCode()
     }
 
 }

@@ -9,15 +9,6 @@ import com.innerCat.multiQR.strAdapter.CellAdapter
 import java.util.ArrayList
 
 
-/**
- * Empty item adapter.
- *
- * @return the item adapter
- */
-fun MasterFragment.emptyItemAdapter(): ItemAdapter {
-    return ItemAdapter(this, ArrayList())
-}
-
 
 /**
  * Item adapter from list

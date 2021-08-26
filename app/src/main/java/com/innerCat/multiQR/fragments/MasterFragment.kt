@@ -2,7 +2,6 @@ package com.innerCat.multiQR.fragments
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
@@ -14,7 +13,6 @@ import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
 import androidx.core.text.bold
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,14 +20,10 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.CaptureActivityPortrait
-import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.activities.SettingsActivity
 import com.innerCat.multiQR.databinding.FragmentMasterBinding
-import com.innerCat.multiQR.databinding.MainActivityBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
-import com.innerCat.multiQR.factories.emptyItemAdapter
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
-import com.innerCat.multiQR.factories.getSharedPreferences
 import com.innerCat.multiQR.factories.itemAdapterFromList
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.itemAdapter.ItemsNotUniqueException
@@ -58,7 +52,6 @@ class MasterFragment : MainActivityFragment() {
 
         setRecyclerViewAdapter()
 
-        mainG.toolbarLayout.title = getTitleString()
 
         mainG.fab.text = getString(R.string.fab_scan_item)
         mainG.fab.setOnClickListener {
@@ -76,19 +69,15 @@ class MasterFragment : MainActivityFragment() {
     private fun setRecyclerViewAdapter() {
         // Create adapter from mainActivity.sharedPreferences
         adapter =
-            if (mainActivity.items.isEmpty() == false) {
-                try {
-                    itemAdapterFromList(
-                        mainActivity.items
-                    )
-                } catch (e: ItemsNotUniqueException) {
-                    mainActivity.items = ArrayList(HashSet(mainActivity.items))
-                    itemAdapterFromList(
-                        mainActivity.items
-                    )
-                }
-            } else {
-                emptyItemAdapter()
+            try {
+                itemAdapterFromList(
+                    mainActivity.items
+                )
+            } catch (e: ItemsNotUniqueException) {
+                mainActivity.items = ArrayList(HashSet(mainActivity.items))
+                itemAdapterFromList(
+                    mainActivity.items
+                )
             }
         // Attach the adapter to the recyclerview to populate items
         g.rvItems.adapter = adapter
@@ -100,7 +89,6 @@ class MasterFragment : MainActivityFragment() {
         matchRegex = mainActivity.sharedPreferences.getMatchRegex(requireActivity())
         splitRegex = mainActivity.sharedPreferences.getSplitRegex(requireActivity())
         populateHeader()
-        adapter.refreshAll(splitRegex)
     }
 
     /**
@@ -126,24 +114,6 @@ class MasterFragment : MainActivityFragment() {
         return splitRegex.split(headerString)
     }
 
-
-    /**
-     * Gets the title string counting how many items there are
-     * @return How many items there are as a formatted string
-     */
-    private fun getTitleString(): String {
-        return when (val count = adapter.itemCount) {
-            0 -> {
-                "No items"
-            }
-            1 -> {
-                "$count item"
-            }
-            else -> {
-                "$count items"
-            }
-        }
-    }
 
     /**
      * Ask the user if they are sure that all the IDs should be cleared
@@ -342,7 +312,7 @@ class MasterFragment : MainActivityFragment() {
      * @param item the Id object to add
      */
     private fun addItem(item: Item) {
-        mutateData { adapter.addItem(item) }
+        mainActivity.mutateData { adapter.addItem(item) }
     }
 
     /**
@@ -350,16 +320,7 @@ class MasterFragment : MainActivityFragment() {
      * @param item The Id object to remove
      */
     internal fun removeItem(item: Item) {
-        mutateData { adapter.removeItem(item) }
-    }
-
-    /**
-     * Save the current adapter information to the persistent data storage
-     */
-    internal fun mutateData(run: () -> Unit) {
-        run()
-        saveData(adapter.itemList, mainActivity.sharedPreferences, getString(R.string.sp_items))
-        mainG.toolbarLayout.title = getTitleString()
+        mainActivity.mutateData { adapter.removeItem(item) }
     }
 
     /**

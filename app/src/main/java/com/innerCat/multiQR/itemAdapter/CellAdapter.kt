@@ -46,12 +46,12 @@ class CellAdapter(
          * @param view the strView
          */
         override fun onClick(view: View) {
-            val direction =
-                MasterFragmentDirections.actionMasterFragmentToDetailFragment(
-                    0
-                )
-            (context as MainActivity).g.appBarLayout.setExpanded(false)
-            view.findNavController().navigate(direction)
+//            val direction =
+//                MasterFragmentDirections.actionMasterFragmentToDetailFragment(
+//                    0
+//                )
+//            (context as MainActivity).g.appBarLayout.setExpanded(false)
+//            view.findNavController().navigate(direction)
         }
 
     }
@@ -74,16 +74,6 @@ class CellAdapter(
         notifyItemInserted(0)
     }
 
-    /**
-     * Refresh all the strs with the new splitRegex
-     * @param splitRegex the regex to split the str's dataString with
-     */
-    fun refreshAll(splitRegex: OptionalRegex) {
-        strs.forEach {
-//            it.updateRegex(splitRegex)
-        }
-        notifyDataSetChanged()
-    }
 
     /**
      * Remove an str.
