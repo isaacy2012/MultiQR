@@ -23,6 +23,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.CaptureActivityPortrait
+import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.activities.SettingsActivity
 import com.innerCat.multiQR.databinding.FragmentMasterBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
@@ -45,6 +46,7 @@ class MasterFragment : Fragment() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var matchRegex: OptionalRegex
     lateinit var splitRegex: OptionalRegex
+    
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,7 +78,8 @@ class MasterFragment : Fragment() {
         // Set layout manager to position the items
         g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
 
-        g.fab.setOnClickListener {
+        (requireActivity() as MainActivity).g.fab.setOnClickListener {
+            println("WINNOW TRIED")
             initiateScan()
         }
 

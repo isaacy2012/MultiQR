@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil.setContentView
 import com.innerCat.multiQR.R
+import com.innerCat.multiQR.databinding.FragmentMasterBinding
 import com.innerCat.multiQR.databinding.MainActivityBinding
 
 
@@ -12,11 +13,12 @@ import com.innerCat.multiQR.databinding.MainActivityBinding
  */
 class MainActivity : AppCompatActivity() {
 
-    lateinit val
+    lateinit var g: MainActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView<MainActivityBinding>(this, R.layout.main_activity)
+        g = setContentView(this, R.layout.main_activity)
+        setSupportActionBar(g.toolbar)
     }
 
 }

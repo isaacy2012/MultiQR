@@ -6,52 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:background="@color/transparent"
-        android:layout_height="@dimen/app_bar_height"
-        app:elevation="0dp"
-        >
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparent"
-            android:fitsSystemWindows="true"
-            app:collapsedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Collapsed"
-            app:contentScrim="?attr/colorOnToolbar"
-            app:expandedTitleGravity="center_vertical"
-            app:expandedTitleMargin="0dp"
-            app:expandedTitleMarginStart="16dp"
-            app:expandedTitleMarginTop="100dp"
-            app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded.WithSize"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:statusBarScrim="@color/transparent"
-            app:title="Title"
-            app:toolbarId="@+id/toolbar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/transparent"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/Theme.multiQR.PopupOverlay">
-
-                <ImageView
-                    android:id="@+id/icon"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:layout_marginEnd="12dp"
-                    app:srcCompat="@drawable/ic_multiqr_icon" />
-
-            </androidx.appcompat.widget.Toolbar>
-
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
