@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
@@ -16,6 +17,8 @@ import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.assertions.assert
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.innerCat.multiQR.fragments.MasterFragment
+import com.innerCat.multiQR.fragments.MasterFragmentDirections
 import com.innerCat.multiQR.util.OptionalRegex
 import com.innerCat.multiQR.views.CellView
 import java.util.*
@@ -24,6 +27,7 @@ import java.util.*
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
+    val fragment: MasterFragment,
     items: MutableList<Item>
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
@@ -69,41 +73,11 @@ class ItemAdapter(
          * @param view the itemView
          */
         override fun onClick(view: View) {
-            val builder = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialog_Rounded)
-            val manualG: ManualInputBinding =
-                ManualInputBinding.inflate((context as MainActivity).layoutInflater)
-
-            manualG.edit.setText(item.dataString)
-            manualG.edit.requestFocus()
-
-            builder.setTitle("Edit Item")
-                .setView(manualG.root)
-                .setPositiveButton(
-                    "Ok"
-                ) { _: DialogInterface?, _: Int ->
-                    item.setDataString(manualG.edit.text.toString(), (context as MainActivity).splitRegex)
-                    notifyItemChanged(items.indexOf(item))
-                    println("WINNOW " + item.toString())
-                    (context as MainActivity).mutateData{}
-                }
-                .setNegativeButton("Cancel") { _: DialogInterface?, _: Int ->
-                    // User cancelled
-                }
-                .setNeutralButton("Delete") { _: DialogInterface?, _: Int ->
-                    (context as MainActivity).removeItem(item)
-                }
-
-            val dialog = builder.create()
-            dialog.show()
-            dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-            val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            okButton.isEnabled = true
-            manualG.edit.addTextChangedListener(
-                getManualAddTextWatcher(
-                    manualG.edit,
-                    okButton
+            val direction =
+                MasterFragmentDirections.actionMasterFragmentToDetailFragment(
+                    item.dataString
                 )
-            )
+            view.findNavController().navigate(direction)
         }
 
     }
