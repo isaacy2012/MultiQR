@@ -2,17 +2,16 @@ package com.innerCat.multiQR.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.android.material.card.MaterialCardView
 import com.innerCat.multiQR.R
 
 open class CellView : LinearLayout {
     init {
         inflate(context, R.layout.cell, this)
         layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f)
+        clipChildren = false
+        clipToPadding = false
 //        cardElevation = 0f
     }
 

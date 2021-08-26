@@ -10,8 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/headerLayout"
@@ -28,6 +27,7 @@
             android:id="@+id/rv_cells"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
             android:clipToPadding="false"
             android:overScrollMode="never"
             android:paddingHorizontal="8dp"

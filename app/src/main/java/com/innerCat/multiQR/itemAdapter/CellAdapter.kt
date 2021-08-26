@@ -29,22 +29,16 @@ class CellAdapter(
     RecyclerView.Adapter<CellAdapter.ViewHolder>() {
 
     /**
-     * Read only property for strList
-     */
-    val strList: List<String>
-        get() = strs.toList()
-
-
-    /**
      * Provide a direct reference to each of the views within a data str
      */
     inner class ViewHolder(var g: MainRvItemBinding, var context: Context) :
         RecyclerView.ViewHolder(g.root),
-        View.OnClickListener {
+        View.OnClickListener, View.OnLongClickListener {
         lateinit var str: String
 
         init {
             g.root.setOnClickListener(this)
+            g.root.setOnLongClickListener(this)
         }
 
         /**
@@ -97,6 +91,10 @@ class CellAdapter(
                     okButton
                 )
             )
+        }
+
+        override fun onLongClick(p0: View): Boolean {
+            return true
         }
 
     }

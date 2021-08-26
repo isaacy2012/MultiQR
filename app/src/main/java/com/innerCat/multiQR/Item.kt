@@ -14,6 +14,8 @@ class Item(dataString: String, splitRegex: OptionalRegex) {
         strList = splitRegex.split(dataString)
     }
 
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -27,6 +29,10 @@ class Item(dataString: String, splitRegex: OptionalRegex) {
 
     override fun hashCode(): Int {
         return strList.hashCode()
+    }
+
+    override fun toString(): String {
+        return "Item(strList=$strList)"
     }
 
 }

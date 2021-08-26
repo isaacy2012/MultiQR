@@ -1,13 +1,17 @@
 package com.innerCat.multiQR.fragments
 
 import android.content.DialogInterface
+import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.State
@@ -17,6 +21,7 @@ import com.innerCat.multiQR.factories.cellAdapterFromList
 import com.innerCat.multiQR.factories.emptyCellAdapter
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.strAdapter.CellAdapter
+import com.innerCat.multiQR.util.fromDpToPixels
 import com.innerCat.multiQR.util.getItemType
 
 class DetailFragment : MainActivityFragment() {
@@ -40,6 +45,7 @@ class DetailFragment : MainActivityFragment() {
         g = FragmentDetailBinding.inflate(layoutInflater)
         setHasOptionsMenu(true)
 
+        ItemTouchHelper(getItemTouchHelperCallback()).attachToRecyclerView(g.rvCells)
         setRecyclerViewAdapter()
 
         mainG.fab.text = getString(R.string.fab_add_column)
@@ -126,6 +132,81 @@ class DetailFragment : MainActivityFragment() {
                 okButton
             )
         )
+    }
+
+
+    private fun getItemTouchHelperCallback(): ItemTouchHelper.Callback {
+        return object : ItemTouchHelper.Callback() {
+            /**
+             * when an item is in the process of being moved
+             * @param recyclerView  the recyclerView
+             * @param viewHolder    the viewholder
+             * @param target        the target viewHolder
+             * @return whether the move was handled
+             */
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                // get the viewHolder's and target's positions in your adapter data, swap them
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                val strs: MutableList<String> = adapter.strs
+                if (fromPosition == toPosition) {
+                    return true
+                } else {
+                    val thisStr: String = strs[fromPosition]
+                    strs.removeAt(fromPosition)
+                    strs.add(toPosition, thisStr)
+                }
+                // and notify the adapter that its dataset has changed
+                adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+                mainActivity.mutateData {  }
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+            //defines the enabled move directions in each state (idle, swiping, dragging).
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                return makeFlag(
+                    ItemTouchHelper.ACTION_STATE_DRAG,
+                    ItemTouchHelper.DOWN or ItemTouchHelper.UP or ItemTouchHelper.START or ItemTouchHelper.END
+                )
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                var scale = 1.0f
+                var z = 0f
+                if (isCurrentlyActive) {
+                    scale = 1.025f
+                    z = fromDpToPixels(3, resources)
+                }
+                val dur = resources.getInteger(R.integer.ith_animation_duration).toLong()
+
+                val cardView: CardView = viewHolder.itemView.findViewById(R.id.cardView)
+                cardView.animate().apply {duration = dur}.z(z)
+                cardView.animate().apply {duration = dur}.z(z)
+
+                cardView.animate().apply {duration = dur}.scaleX(scale)
+                cardView.animate().apply {duration = dur}.scaleY(scale)
+//                cardView.animate().scaleY(end)
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+
+        }
     }
 
 }

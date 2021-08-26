@@ -2,4 +2,5 @@
 <resources>
     <integer name="max_items_limit">20</integer>
     <integer name="fab_animation_duration">375</integer>
+    <integer name="ith_animation_duration">150</integer>
 </resources>
