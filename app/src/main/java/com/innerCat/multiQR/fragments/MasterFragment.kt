@@ -38,12 +38,14 @@ import java.io.File
 import java.io.FileWriter
 import java.lang.Integer.min
 
+
 class MasterFragment : MainActivityFragment() {
 
     private lateinit var g: FragmentMasterBinding
     private lateinit var adapter: ItemAdapter
     private lateinit var matchRegex: OptionalRegex
     lateinit var splitRegex: OptionalRegex
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +55,10 @@ class MasterFragment : MainActivityFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         g = FragmentMasterBinding.inflate(layoutInflater)
         setHasOptionsMenu(true)
+
+        mainG.toolbar.setNavigationIcon(R.drawable.ic_multiqr_icon_24)
+        navigationImageButton?.visibility = INVISIBLE
+        mainG.toolbar.setNavigationOnClickListener {}
 
         setRecyclerViewAdapter()
 
@@ -89,6 +95,9 @@ class MasterFragment : MainActivityFragment() {
         g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
     }
 
+    /**
+     * Refresh regex from sharedPreferences
+     */
     private fun refresh() {
         matchRegex = mainActivity.sharedPreferences.getMatchRegex(requireActivity())
         splitRegex = mainActivity.sharedPreferences.getSplitRegex(requireActivity())
@@ -106,7 +115,9 @@ class MasterFragment : MainActivityFragment() {
                 g.headerLayout.addView(spacedTextView)
             }
             if (it.size >= MAX_COLS) {
-                g.headerLayout.addView(makeMoreHorizontal(mainActivity).apply {visibility = INVISIBLE})
+                g.headerLayout.addView(makeMoreHorizontal(mainActivity).apply {
+                    visibility = INVISIBLE
+                })
             }
         }
 //        getHeaderStrings()?.forEach {
@@ -205,7 +216,9 @@ class MasterFragment : MainActivityFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         // Inflate the menu; requireActivity() adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_main, menu)
+        fadeInMenuIcons(menu, R.id.action_add_manually)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will

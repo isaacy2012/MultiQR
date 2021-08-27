@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     /**
      * TODO Replace with new way
      */

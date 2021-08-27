@@ -7,6 +7,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import com.innerCat.multiQR.R
 
+/**
+ * Create "more horizontal" View
+ */
 fun makeMoreHorizontal(context: Context): ImageView {
     return ImageView(context).apply {
         setImageResource(R.drawable.ic_baseline_more_horiz_24)

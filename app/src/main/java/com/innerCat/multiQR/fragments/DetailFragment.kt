@@ -24,6 +24,7 @@ import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.strAdapter.CellAdapter
 import com.innerCat.multiQR.util.getItemType
 
+
 class DetailFragment : MainActivityFragment() {
 
     private lateinit var g: FragmentDetailBinding
@@ -41,6 +42,11 @@ class DetailFragment : MainActivityFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         mainActivity.state = State.DETAIL_FRAGMENT
+
+        mainG.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+        navigationImageButton?.visibility = View.INVISIBLE
+        mainG.toolbar.setNavigationOnClickListener { mainActivity.onBackPressed() }
+
 
         g = FragmentDetailBinding.inflate(layoutInflater)
         setHasOptionsMenu(true)
@@ -82,6 +88,7 @@ class DetailFragment : MainActivityFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         // Inflate the menu; requireActivity() adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_detail, menu)
+        fadeInMenuIcons(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
