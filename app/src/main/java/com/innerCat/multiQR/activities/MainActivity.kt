@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil.setContentView
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.PurchasesUpdatedListener
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
@@ -33,6 +35,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
     var state: State = State.MAIN
 
+    private val purchasesUpdatedListener =
+        PurchasesUpdatedListener { billingResult, purchases ->
+            // To be implemented in a later section.
+        }
+
+    lateinit var billingClient: BillingClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getSharedPreferences(this)?.let {
@@ -49,6 +58,12 @@ class MainActivity : AppCompatActivity() {
         g.appBarLayout.addOnOffsetChangedListener(OnOffsetChangedListener { _, verticalOffset ->
             actionBarExpanded = verticalOffset == 0
         })
+
+        billingClient = BillingClient.newBuilder(this)
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases()
+            .build()
+
 
         setSupportActionBar(g.toolbar)
     }

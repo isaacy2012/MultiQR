@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.billingclient.api.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.integration.android.IntentIntegrator
 import com.innerCat.multiQR.Item
@@ -24,6 +25,7 @@ import com.innerCat.multiQR.activities.CaptureActivityPortrait
 import com.innerCat.multiQR.activities.SettingsActivity
 import com.innerCat.multiQR.databinding.FragmentMasterBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
+import com.innerCat.multiQR.dp
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.factories.itemAdapterFromList
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
@@ -246,6 +248,7 @@ class MasterFragment : AbstractMainActivityFragment() {
         }
     }
 
+
     /**
      * Check if we have reached the limit of adding items, and if so, show a dialog
      */
@@ -259,9 +262,26 @@ class MasterFragment : AbstractMainActivityFragment() {
             )
             builder.setTitle("Item Limit Reached")
                 .setMessage("Sorry, you can only add up to $limit items. An update will be released later, which will allow adding of unlimited items.")
-                .setPositiveButton(
-                    "Ok"
-                ) { _: DialogInterface?, _: Int ->
+                .setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
+                    dp { println(" i mean im here") }
+                    mainActivity.billingClient.startConnection(object : BillingClientStateListener {
+                        override fun onBillingSetupFinished(billingResult: BillingResult) {
+                            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK ) {
+                                // The BillingClient is ready. You can query purchases here.
+                                    dp { println("TRying") }
+                                    queryAvaliableProducts()
+                            } else {
+                                dp { println("response code bad: " + billingResult.responseCode) }
+                            }
+                        }
+
+                        override fun onBillingServiceDisconnected() {
+                            // Try to restart the connection on the next request to
+                            // Google Play by calling the startConnection() method.
+                            // TODO display message
+                            dp { println("failed") }
+                        }
+                    })
                 }
             val dialog = builder.create()
             dialog.show()
@@ -269,6 +289,63 @@ class MasterFragment : AbstractMainActivityFragment() {
         }
         return true
     }
+
+    fun queryAvaliableProducts() {
+        dp { println("Querying...") }
+        val params = SkuDetailsParams.newBuilder()
+            .setSkusList(listOf("unlimited_scans"))
+            .setType(BillingClient.SkuType.INAPP)
+
+
+        mainActivity.billingClient.querySkuDetailsAsync(params.build()) {
+                billingResult, skuDetailsList ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !skuDetailsList.isNullOrEmpty()) {
+                for (skuDetails in skuDetailsList) {
+                    dp { println("skuDetailsList : ${skuDetailsList}") }
+                    //This list should contain the products added above
+                    skuDetails?.let {
+                        val billingFlowParams = BillingFlowParams.newBuilder()
+                            .setSkuDetails(it)
+                            .build()
+                        mainActivity.billingClient.launchBillingFlow(mainActivity, billingFlowParams).responseCode
+                    }?: dp { println("Billing failed") }
+                }
+            } else {
+                dp { println("biling response cdeb ack: " + billingResult.responseCode) }
+                dp { println("whats in here: " + skuDetailsList) }
+            }
+        }
+    }
+
+    private val purchaseUpdateListener =
+        PurchasesUpdatedListener { billingResult, purchases ->
+            dp {println("billingResult responseCode : ${billingResult.responseCode}") }
+
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+                for (purchase in purchases) {
+                    dp { println("handlePurchase : ${purchase}") }
+                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                        if (!purchase.isAcknowledged) {
+                            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.purchaseToken).build()
+                            mainActivity.billingClient.acknowledgePurchase(acknowledgePurchaseParams) { billingResult ->
+                                val billingResponseCode = billingResult.responseCode
+                                val billingDebugMessage = billingResult.debugMessage
+
+                                dp { println("response code: $billingResponseCode") }
+                                dp { println("debugMessage : $billingDebugMessage") }
+
+                            }
+                        }
+                    }
+                }
+            } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+                // Handle an error caused by a user cancelling the purchase flow.
+            } else {
+                // Handle any other error codes.
+            }
+        }
+
 
     /**
      * Initiate a scan
