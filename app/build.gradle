@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -19,7 +20,7 @@ android {
     }
     buildFeatures {
         viewBinding true
-        dataBinding false
+        dataBinding true
     }
     buildTypes {
         release {
@@ -51,6 +52,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.4.0'
     kapt 'com.android.databinding:compiler:3.1.4'

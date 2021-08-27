@@ -18,6 +18,7 @@
         <item name="android:navigationBarColor">@color/background_material_light</item>
         <!-- Customize your theme here. -->
         <item name="colorOnCard">#F6F6F6</item>
+        <item name="colorOnCardSelected">#E6E6E6</item>
         <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="actionBarTheme">@style/TransparentActionBar</item>
     </style>

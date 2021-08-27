@@ -7,7 +7,7 @@ interface OptionalRegex {
      */
     fun passes(str: String): Boolean
 
-    fun split(str: String): List<String>
+    fun split(str: String): MutableList<String>
 }
 
 class EnabledRegex(regexString: String) : OptionalRegex {
@@ -21,8 +21,8 @@ class EnabledRegex(regexString: String) : OptionalRegex {
         return regex.matches(str)
     }
 
-    override fun split(str: String): List<String> {
-        return regex.split(str)
+    override fun split(str: String): MutableList<String> {
+        return ArrayList(regex.split(str))
     }
 }
 
@@ -35,7 +35,7 @@ class DisabledRegex : OptionalRegex {
         return true
     }
 
-    override fun split(str: String): List<String> {
-        return listOf(str)
+    override fun split(str: String): MutableList<String> {
+        return mutableListOf(str)
     }
 }

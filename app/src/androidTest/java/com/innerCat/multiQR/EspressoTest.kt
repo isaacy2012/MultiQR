@@ -20,6 +20,7 @@ import org.hamcrest.TypeSafeMatcher
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.String
 
 /**
  * Instrumented test, which will execute on an Android device.

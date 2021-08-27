@@ -1,32 +1,20 @@
 package com.innerCat.multiQR.util
 
-import com.innerCat.multiQR.Item
+import android.content.res.Resources
+import android.util.TypedValue
 
 /**
- * Parse a list of strings into a single CSV
+ * Converts dp to pixels. Used for setting padding programmatically and responsively
  *
- * NOTE: this util function is basic for the MVP, but kept in case it is needed to format the
- * output differently in future
- *
- * @param list - list to parse
+ * @param dp the dp
+ * @param r  resources
+ * @return the number of pixels
  */
-fun listToString(list: List<Item>): String {
-    return list.joinToString(","){
-        it.dataString
-    }
+fun fromDpToPixels(dp: Int, r: Resources): Float {
+    val px = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        dp.toFloat(),
+        r.displayMetrics
+    )
+    return px
 }
-
-/**
- * Parse a list of strings into a single CSV for email
- *
- * NOTE: this util function is basic for the MVP, but kept in case it is needed to format the
- * output differently in future
- *
- * @param list - list to parse
- */
-fun listToEmailString(list: List<Item>): String {
-    return list.joinToString(",\n"){
-        it.dataString
-    }
-}
-

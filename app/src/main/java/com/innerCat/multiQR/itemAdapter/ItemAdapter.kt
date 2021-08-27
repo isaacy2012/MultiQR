@@ -1,34 +1,34 @@
 package com.innerCat.multiQR.itemAdapter
 
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.innerCat.multiQR.Item
-import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
-import com.innerCat.multiQR.databinding.MainRvItemBinding
-import com.innerCat.multiQR.databinding.ManualInputBinding
-import com.innerCat.multiQR.factories.getManualAddTextWatcher
 import com.innerCat.multiQR.assertions.assert
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.innerCat.multiQR.util.OptionalRegex
+import com.innerCat.multiQR.databinding.MainRvItemBinding
+import com.innerCat.multiQR.fragments.MasterFragment
+import com.innerCat.multiQR.fragments.MasterFragmentDirections
 import com.innerCat.multiQR.views.CellView
+import com.innerCat.multiQR.views.makeMoreHorizontal
+import java.lang.Integer.min
 import java.util.*
 
+
+val MAX_COLS = 3
+
+class ItemsNotUniqueException : RuntimeException()
 /**
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
-    var splitRegex: OptionalRegex,
-    items: MutableList<Item>
+    val fragment: MasterFragment,
+    private val items: MutableList<Item>
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
-    private var items: MutableList<Item>
     private var itemSet: HashSet<Item>
 
     /**
@@ -38,11 +38,10 @@ class ItemAdapter(
      */
     init {
         // Try to preserve order if there are no duplicates
-        this.items = ArrayList(items)
         this.itemSet = HashSet(items)
         // Otherwise make a new ArrayList from the HashSet
         if (this.items.size != this.itemSet.size) {
-            this.items = ArrayList(itemSet)
+            throw ItemsNotUniqueException()
         }
     }
 
@@ -70,40 +69,13 @@ class ItemAdapter(
          * @param view the itemView
          */
         override fun onClick(view: View) {
-            val builder = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialog_Rounded)
-            val manualG: ManualInputBinding =
-                ManualInputBinding.inflate((context as MainActivity).layoutInflater)
-
-            manualG.edit.setText(item.dataString)
-            manualG.edit.requestFocus()
-
-            builder.setTitle("Edit Item")
-                .setView(manualG.root)
-                .setPositiveButton(
-                    "Ok"
-                ) { _: DialogInterface?, _: Int ->
-                    item.dataString = manualG.edit.text.toString()
-                    notifyItemChanged(items.indexOf(item))
-                    (context as MainActivity).mutateData{}
-                }
-                .setNegativeButton("Cancel") { _: DialogInterface?, _: Int ->
-                    // User cancelled
-                }
-                .setNeutralButton("Delete") { _: DialogInterface?, _: Int ->
-                    (context as MainActivity).removeItem(item)
-                }
-
-            val dialog = builder.create()
-            dialog.show()
-            dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-            val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            okButton.isEnabled = true
-            manualG.edit.addTextChangedListener(
-                getManualAddTextWatcher(
-                    manualG.edit,
-                    okButton
+            (context as MainActivity).g.fab.shrink()
+            val direction =
+                MasterFragmentDirections.actionMasterFragmentToDetailFragment(
+                    (context as MainActivity).items.indexOf(item)
                 )
-            )
+            (context as MainActivity).g.appBarLayout.setExpanded(false)
+            view.findNavController().navigate(direction)
         }
 
     }
@@ -129,6 +101,7 @@ class ItemAdapter(
             notifyItemInserted(0)
         }
     }
+
 
     /**
      * Remove an item.
@@ -157,11 +130,17 @@ class ItemAdapter(
         holder.item = items[position]
         val g: MainRvItemBinding = holder.g
         g.root.removeAllViews()
-        val arr = splitRegex.split(holder.item.dataString)
-        arr.forEach {
-            val cell = CellView(holder.context, it)
+        for (i in 0 until min(MAX_COLS, holder.item.strList.size)) {
+            val cell = CellView(holder.context, holder.item.strList[i])
             g.root.addView(cell)
         }
+        if (holder.item.strList.size >= MAX_COLS) {
+            g.root.addView(makeMoreHorizontal(holder.context))
+        }
+//        holder.item.strList.forEach {
+//            val cell = CellView(holder.context, it)
+//            g.root.addView(cell)
+//        }
     }
 
     /**

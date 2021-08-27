@@ -36,10 +36,20 @@ fun SharedPreferences.getSplitRegex(context: Context): OptionalRegex {
  */
 fun SharedPreferences.getMatchRegex(context: Context): OptionalRegex {
     val matchRegexEnable =
-        getBoolean(context.getString(R.string.sp_match_regex_enable), true)
+        getBoolean(context.getString(R.string.sp_match_regex_enable), false)
     val matchRegexString = getString(
         context.getString(R.string.sp_match_regex_string),
         context.getString(R.string.default_regex_string)
     )
     return if (matchRegexEnable && matchRegexString != null) EnabledRegex(matchRegexString) else DisabledRegex()
+}
+
+/**
+ * Get the item type from sharedPreferences
+ */
+fun SharedPreferences.getItemType(context: Context): String? {
+    return getString(
+        context.getString(R.string.sp_item_type),
+        context.getString(R.string.default_item_type)
+    )
 }

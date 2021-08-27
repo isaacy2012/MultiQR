@@ -3,17 +3,16 @@ package com.innerCat.multiQR.util
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 
-fun write(stringToWrite: String, sharedPreferences: SharedPreferences, spItemsStr: String) {
+fun write(stringToWrite: kotlin.String, sharedPreferences: SharedPreferences, spItemsStr: kotlin.String) {
     val editor = sharedPreferences.edit()
     editor.putString(spItemsStr, stringToWrite)
     editor.apply()
 }
 
-fun saveData(itemList: List<Item>, sharedPreferences: SharedPreferences, spItemsStr: String) {
+fun saveData(itemList: List<Item>, sharedPreferences: SharedPreferences, spItemsStr: kotlin.String) {
     write(Gson().toJson(itemList), sharedPreferences, spItemsStr)
 }
 
@@ -28,6 +27,6 @@ fun loadData(context: Context, sharedPreferences: SharedPreferences): MutableLis
 }
 
 
-fun clearData(sharedPreferences: SharedPreferences, spItemsStr: String) {
+fun clearData(sharedPreferences: SharedPreferences, spItemsStr: kotlin.String) {
     write("", sharedPreferences, spItemsStr)
 }
