@@ -1,0 +1,2 @@
+Your data is not collected by me whatsoever.
+The camera is only used to scan QR codes. It uses the ZXing-embedded library, which I do not have control over.
