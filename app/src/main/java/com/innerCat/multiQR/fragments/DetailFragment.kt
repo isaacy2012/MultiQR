@@ -25,7 +25,7 @@ import com.innerCat.multiQR.strAdapter.CellAdapter
 import com.innerCat.multiQR.util.getItemType
 
 
-class DetailFragment : MainActivityFragment() {
+class DetailFragment : AbstractMainActivityFragment() {
 
     private lateinit var g: FragmentDetailBinding
     private lateinit var adapter: CellAdapter

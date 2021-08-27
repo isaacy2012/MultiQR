@@ -39,7 +39,7 @@ import java.io.FileWriter
 import java.lang.Integer.min
 
 
-class MasterFragment : MainActivityFragment() {
+class MasterFragment : AbstractMainActivityFragment() {
 
     private lateinit var g: FragmentMasterBinding
     private lateinit var adapter: ItemAdapter

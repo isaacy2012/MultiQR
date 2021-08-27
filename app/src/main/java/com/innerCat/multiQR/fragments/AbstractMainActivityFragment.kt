@@ -17,7 +17,7 @@ import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.databinding.MainActivityBinding
 
 
-abstract class MainActivityFragment : Fragment() {
+abstract class AbstractMainActivityFragment : Fragment() {
     // Store a pointer to the main Activity Binding
     lateinit var mainG: MainActivityBinding
     // return a pointer to the mainActivity
@@ -28,7 +28,7 @@ abstract class MainActivityFragment : Fragment() {
 
 
     // cache pointer if not null
-    var _navigationImageButton: ImageButton? = null
+    private var _navigationImageButton: ImageButton? = null
     // return a pointer to the "back" button
     val navigationImageButton: ImageButton?
         get() {
@@ -64,6 +64,11 @@ abstract class MainActivityFragment : Fragment() {
         return view
     }
 
+    /**
+     * Fades in menu icons
+     * @param menu The menu
+     * @param icons The R.id.* of the icons
+     */
     protected fun fadeInMenuIcons(menu: Menu, vararg icons: Int) {
         Handler(Looper.getMainLooper()).post {
             // Setup animation
