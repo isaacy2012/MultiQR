@@ -53,3 +53,10 @@ fun SharedPreferences.getItemType(context: Context): String? {
         context.getString(R.string.default_item_type)
     )
 }
+
+/**
+ * Whether we should show onboarding
+ */
+fun SharedPreferences.getShouldShowOnboarding(context: Context): Boolean {
+    return getBoolean(context.getString(R.string.sp_should_show_onboarding), true)
+}
