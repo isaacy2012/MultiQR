@@ -134,7 +134,7 @@ class ItemAdapter(
             val cell = CellView(holder.context, holder.item.strList[i])
             g.root.addView(cell)
         }
-        if (holder.item.strList.size >= MAX_COLS) {
+        if (holder.item.strList.size > MAX_COLS) {
             g.root.addView(makeMoreHorizontal(holder.context))
         }
 //        holder.item.strList.forEach {

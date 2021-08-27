@@ -114,7 +114,7 @@ class MasterFragment : AbstractMainActivityFragment() {
                 val spacedTextView = HeaderTextView(requireActivity(), it[i])
                 g.headerLayout.addView(spacedTextView)
             }
-            if (it.size >= MAX_COLS) {
+            if (it.size > MAX_COLS) {
                 g.headerLayout.addView(makeMoreHorizontal(mainActivity).apply {
                     visibility = INVISIBLE
                 })
@@ -277,6 +277,7 @@ class MasterFragment : AbstractMainActivityFragment() {
             return
         }
         val integrator = IntentIntegrator(requireActivity())
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
         integrator.setPrompt("Press back to finish")
         integrator.setOrientationLocked(true)
         integrator.setBeepEnabled(false)
