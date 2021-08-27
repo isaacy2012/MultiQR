@@ -26,9 +26,9 @@ abstract class AbstractMainActivityFragment : Fragment() {
             return (requireActivity() as MainActivity)
         }
 
-
     // cache pointer if not null
     private var _navigationImageButton: ImageButton? = null
+
     // return a pointer to the "back" button
     val navigationImageButton: ImageButton?
         get() {
