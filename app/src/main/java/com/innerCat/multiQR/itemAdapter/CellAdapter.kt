@@ -113,8 +113,8 @@ class CellAdapter(
      * @param str     the String to add
      */
     fun addString(str: String) {
-        strs.add(0, str)
-        notifyItemInserted(0)
+        strs.add(str)
+        notifyItemInserted(strs.size)
     }
 
 
