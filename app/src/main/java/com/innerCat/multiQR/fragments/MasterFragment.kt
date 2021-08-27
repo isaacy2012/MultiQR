@@ -10,7 +10,7 @@ import android.os.Looper
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
-import android.view.View.INVISIBLE
+import android.view.View.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -93,6 +93,7 @@ class MasterFragment : AbstractMainActivityFragment() {
         g.rvItems.adapter = adapter
         // Set layout manager to position the items
         g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
+        updateRVVisibility()
     }
 
     /**
@@ -150,15 +151,11 @@ class MasterFragment : AbstractMainActivityFragment() {
         builder.setMessage(
             "Are you sure you wish to clear all data?"
         )
-            .setPositiveButton(
-                "Delete"
-            ) { _: DialogInterface?, _: Int ->
+            .setPositiveButton("Delete") { _: DialogInterface?, _: Int ->
                 adapter.reset()
                 clearData(mainActivity.sharedPreferences, getString(R.string.sp_items))
             }
-            .setNegativeButton(
-                "Cancel"
-            ) { _: DialogInterface?, _: Int -> }
+            .setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> }
         val dialog = builder.create()
         dialog.show()
     }
@@ -259,10 +256,7 @@ class MasterFragment : AbstractMainActivityFragment() {
             )
             builder.setTitle("Item Limit Reached")
                 .setMessage("Sorry, you can only add up to $limit items. An update will be released later, which will allow adding of unlimited items.")
-                .setPositiveButton(
-                    "Ok"
-                ) { _: DialogInterface?, _: Int ->
-                }
+                .setPositiveButton("Ok") { _: DialogInterface?, _: Int -> }
             val dialog = builder.create()
             dialog.show()
             return false
@@ -329,11 +323,19 @@ class MasterFragment : AbstractMainActivityFragment() {
     }
 
     /**
+     * mutateData
+     */
+    private fun mutateData(run: () -> Unit) {
+        mainActivity.mutateData(run)
+        updateRVVisibility()
+    }
+
+    /**
      * Add an item to the adapter and persistent data storage
      * @param item the Id object to add
      */
     private fun addItem(item: Item) {
-        mainActivity.mutateData { adapter.addItem(item) }
+        mutateData { adapter.addItem(item) }
     }
 
     /**
@@ -341,7 +343,17 @@ class MasterFragment : AbstractMainActivityFragment() {
      * @param item The Id object to remove
      */
     internal fun removeItem(item: Item) {
-        mainActivity.mutateData { adapter.removeItem(item) }
+        mutateData { adapter.removeItem(item) }
+    }
+
+    fun updateRVVisibility() {
+        if (adapter.itemList.isEmpty()) {
+            g.rvItems.visibility = GONE
+            g.emptyLayout.visibility = VISIBLE
+        } else {
+            g.rvItems.visibility = VISIBLE
+            g.emptyLayout.visibility = GONE
+        }
     }
 
     /**
@@ -363,15 +375,11 @@ class MasterFragment : AbstractMainActivityFragment() {
         builder.setMessage(
             ssb
         )
-            .setPositiveButton(
-                "Add"
-            ) { _: DialogInterface?, _: Int ->
+            .setPositiveButton("Add") { _: DialogInterface?, _: Int ->
                 addItem(Item(output, splitRegex))
                 onComplete()
             }
-            .setNegativeButton(
-                "Discard"
-            ) { _: DialogInterface?, _: Int ->
+            .setNegativeButton("Discard") { _: DialogInterface?, _: Int ->
                 onComplete()
             }
         val dialog = builder.create()

@@ -65,6 +65,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/settings_credits_header">
+
+        <Preference
+            android:summary="Box icon made by Freepik from Flaticon"
+            android:persistent="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="@string/box_icon_info" />
+        </Preference>
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/settings_about_header">
 
         <Preference
@@ -72,6 +82,7 @@
             android:persistent="false"
             android:selectable="false"
             android:summary="@string/about_info" />
+
 
     </PreferenceCategory>
 

@@ -31,7 +31,32 @@
             android:clipToPadding="false"
             android:overScrollMode="never"
             android:paddingHorizontal="8dp"
-            android:paddingBottom="80dp" />
+            android:paddingBottom="80dp"
+            tools:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/emptyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="75dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_marginBottom="50dp"
+                app:srcCompat="@drawable/ic_open_box"
+                app:tint="@color/secondaryDarkColor" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add items by scanning or clicking the '+' button" />
+        </LinearLayout>
 
     </LinearLayout>
 
