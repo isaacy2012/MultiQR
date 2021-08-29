@@ -1,17 +1,15 @@
 package com.innerCat.multiQR.activities
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Html
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil.setContentView
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.innerCat.MultiQR.activities.OnboardingActivity
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
@@ -56,6 +54,9 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+        sharedPreferences.edit {
+            putBoolean(getString(R.string.sp_should_show_onboarding), true)
+        }
         if (sharedPreferences.getShouldShowOnboarding(this)) {
             showOnboarding()
         }
@@ -64,6 +65,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showOnboarding() {
+        val intent = Intent(this, OnboardingActivity::class.java)
+        startActivity(intent)
+
+        /*
         // Use the Builder class for convenient dialog construction
         val limit = resources.getInteger(R.integer.max_items_limit)
         val builder = MaterialAlertDialogBuilder(
@@ -71,20 +76,31 @@ class MainActivity : AppCompatActivity() {
             R.style.MaterialAlertDialog_Rounded
         )
         builder.setTitle("Welcome")
-            .setMessage(Html.fromHtml("" +
-                    "Thank you for downloading <b>MultiQR</b>." +
-                    "<br><br>" +
-                    "This is a trial version of the app, and <b>you can only add up to $limit items</b>. " +
-                    "<br><br>" +
-                    "An update will be coming soon with an in-app purchase to enable adding unlimited items." +
-                    "<br><br>" +
-                    "Thanks for your understanding!" +
-                    "", Html.FROM_HTML_MODE_COMPACT))
+            .setMessage(
+                Html.fromHtml(
+                    "" +
+                            "Thank you for downloading <b>MultiQR</b>." +
+                            "<br><br>" +
+                            "This is a trial version of the app, and <b>you can only add up to $limit items</b>. " +
+                            "<br><br>" +
+                            "An update will be coming soon with an in-app purchase to enable adding unlimited items." +
+                            "<br><br>" +
+                            "Thanks for your understanding!" +
+                            "", Html.FROM_HTML_MODE_COMPACT
+                )
+            )
             .setPositiveButton("I Understand") { _: DialogInterface?, _: Int ->
-                sharedPreferences.edit { putBoolean(getString(R.string.sp_should_show_onboarding), false) }
+                sharedPreferences.edit {
+                    putBoolean(
+                        getString(R.string.sp_should_show_onboarding),
+                        false
+                    )
+                }
             }
         val dialog = builder.create()
         dialog.show()
+
+         */
     }
 
     /**
@@ -98,9 +114,9 @@ class MainActivity : AppCompatActivity() {
      * Save the current adapter information to the persistent data storage
      */
     fun mutateData(run: () -> Unit) {
-        dp{println("BEFORE " + items)}
+        dp { println("BEFORE " + items) }
         run()
-        dp{println("AFTER" + items)}
+        dp { println("AFTER" + items) }
         saveData(items, sharedPreferences, getString(R.string.sp_items))
         g.toolbarLayout.title = getTitleString()
     }
