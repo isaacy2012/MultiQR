@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil.setContentView
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
-import com.innerCat.multiQR.activities.OnboardingActivity
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
@@ -54,9 +52,9 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        sharedPreferences.edit {
-            putBoolean(getString(R.string.sp_should_show_onboarding), true)
-        }
+//        sharedPreferences.edit {
+//            putBoolean(getString(R.string.sp_should_show_onboarding), true)
+//        }
         if (sharedPreferences.getShouldShowOnboarding(this)) {
             showOnboarding()
         }

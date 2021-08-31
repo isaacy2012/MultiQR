@@ -29,14 +29,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.innerCat.multiQR.R
+import com.innerCat.multiQR.factories.getSharedPreferences
 
-data class Page(val title: String, val description: AnnotatedString, @DrawableRes val image: Int);
+data class Page(val title: String?, val description: AnnotatedString, @DrawableRes val image: Int);
 
 class OnboardingActivity : AppCompatActivity() {
 
@@ -44,12 +46,16 @@ class OnboardingActivity : AppCompatActivity() {
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        getSharedPreferences(this)?.edit {
+            putBoolean(getString(R.string.sp_should_show_onboarding), false)
+        }
         setContent {
             AppCompatTheme {
-                OnboardingUI({ finish() })
+                OnboardingUI { finish() }
             }
         }
     }
+
 }
 
 val onboardingPages = listOf(
@@ -73,7 +79,26 @@ val onboardingPages = listOf(
             append("keyword to insert the current date and time into the name of the file.")
         },
         R.drawable.ic_onboard_page3
-    )
+    ),
+    Page(
+        null,
+        buildAnnotatedString {
+            append("Thank you for downloading ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("MultiQR")
+            }
+            append(".\n\n")
+            append("This is a trial version of the app, and you can only add up to ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("50 ")
+            }
+            append("items.\n\n")
+            append("An update will be coming soon with an in-app purchase to enable adding unlimited items.")
+            append("\n\n")
+            append("Thanks for your understanding!")
+        },
+        R.drawable.ic_onboard_page4
+    ),
 )
 
 
@@ -91,7 +116,7 @@ fun Preview() {
 fun OnboardingUI(
     onClick: () -> Unit,
 ) {
-    val pagerState = rememberPagerState(pageCount = 3)
+    val pagerState = rememberPagerState(pageCount = 4)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -106,7 +131,7 @@ fun OnboardingUI(
             PageUI(page = onboardingPages[page])
         }
 
-        AnimatedVisibility(visible = pagerState.currentPage == 2) {
+        AnimatedVisibility(visible = pagerState.currentPage == 3) {
             OutlinedButton(
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier
@@ -173,22 +198,24 @@ fun PageUI(page: Page) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .padding(horizontal = 32.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = page.title,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily(Font(R.font.lato_bold_ttf)),
-                textAlign = TextAlign.Start,
-                modifier = Modifier.width(220.dp)
-            )
+        if (page.title != null) {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = page.title,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.lato_bold_ttf)),
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.width(220.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(60.dp))
         }
-        Spacer(modifier = Modifier.height(60.dp))
 
         Image(
             painter = painterResource(page.image),

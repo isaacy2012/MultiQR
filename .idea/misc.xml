@@ -3,6 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.2640625" />
+        <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/drawable/ic_onboard_page1.xml" value="0.2640625" />
+        <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/drawable/ic_onboard_page2.xml" value="0.2640625" />
+        <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/drawable/ic_onboard_page3.xml" value="0.2640625" />
+        <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/drawable/ic_onboard_page4.xml" value="0.2640625" />
+        <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/drawable/ic_undraw_proud_coder_7ain.xml" value="0.2640625" />
         <entry key="..\:/Users/Isaac Young/Documents/GitHub/MultiQR/app/src/main/res/font/lato_bold.xml" value="0.278125" />
       </map>
     </option>
