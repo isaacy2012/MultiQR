@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil.setContentView
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
-import com.innerCat.MultiQR.activities.OnboardingActivity
+import com.innerCat.multiQR.activities.OnboardingActivity
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding

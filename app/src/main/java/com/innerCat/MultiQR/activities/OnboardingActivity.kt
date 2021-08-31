@@ -1,4 +1,4 @@
-package com.innerCat.MultiQR.activities
+package com.innerCat.multiQR.activities
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
