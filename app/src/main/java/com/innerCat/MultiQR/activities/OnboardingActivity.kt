@@ -18,10 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,7 +36,7 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.innerCat.multiQR.R
 
-data class Page(val title: String, val description: String, @DrawableRes val image: Int);
+data class Page(val title: String, val description: AnnotatedString, @DrawableRes val image: Int);
 
 class OnboardingActivity : AppCompatActivity() {
 
@@ -51,17 +55,23 @@ class OnboardingActivity : AppCompatActivity() {
 val onboardingPages = listOf(
     Page(
         "Organise your QR Scanning",
-        "Use a regex string to split a scan into columns.",
+        buildAnnotatedString { append("Use a regex string to split a scan into columns.") },
         R.drawable.ic_onboard_page1
     ),
     Page(
         "Edit scanned data on-device",
-        "Click on a row to view and edit its columns.",
+        buildAnnotatedString { append("Click on a row to view and edit its columns.") },
         R.drawable.ic_onboard_page2
     ),
     Page(
         "Share with export to .CSV",
-        "Use the \$date keyword to insert the current date and time into the name of the file.",
+        buildAnnotatedString {
+            append("Use the ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("\$date ")
+            }
+            append("keyword to insert the current date and time into the name of the file.")
+        },
         R.drawable.ic_onboard_page3
     )
 )
@@ -120,8 +130,9 @@ fun OnboardingUI(
 //                .padding(16.dp)
 //                .clickable { onClick() }
 //        )
-        Box (
-            modifier = Modifier.fillMaxWidth()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = 24.dp),
         ) {
             OutlinedButton(
@@ -131,7 +142,7 @@ fun OnboardingUI(
                 onClick = onClick,
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = colorResource(R.color.transparent),
-                    contentColor = colorResource(R.color.secondaryDarkColor),
+                    contentColor = colorResource(android.R.color.tab_indicator_text),
                 ),
                 border = null
             ) {
@@ -139,8 +150,10 @@ fun OnboardingUI(
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth().align(Alignment.Center)
-                    .padding(bottom=16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                    .padding(bottom = 16.dp)
             ) {
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
