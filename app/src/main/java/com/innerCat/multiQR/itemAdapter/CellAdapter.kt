@@ -81,7 +81,7 @@ class CellAdapter(
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             okButton.isEnabled = true
-            if (fragment.mainActivity.sharedPreferences.getItemType(fragment.mainActivity)
+            if (fragment.viewModel.sharedPreferences.getItemType(fragment.mainActivity)
                     .equals("numeric")) {
                 manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
             }

@@ -10,8 +10,8 @@ import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.assertions.assert
 import com.innerCat.multiQR.databinding.MainRvItemBinding
-import com.innerCat.multiQR.fragments.MasterFragment
 import com.innerCat.multiQR.fragments.MasterFragmentDirections
+import com.innerCat.multiQR.viewmodels.MainViewModel
 import com.innerCat.multiQR.views.CellView
 import com.innerCat.multiQR.views.makeMoreHorizontal
 import java.lang.Integer.min
@@ -25,11 +25,14 @@ class ItemsNotUniqueException : RuntimeException()
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
-    val fragment: MasterFragment,
-    private val items: MutableList<Item>
+    val viewModel: MainViewModel,
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     private var itemSet: HashSet<Item>
+    val items: MutableList<Item>
+        get() {
+            return viewModel.items
+        }
 
     /**
      * Pass in the tasks array into the Adapter
@@ -72,7 +75,7 @@ class ItemAdapter(
             (context as MainActivity).g.fab.shrink()
             val direction =
                 MasterFragmentDirections.actionMasterFragmentToDetailFragment(
-                    (context as MainActivity).items.indexOf(item)
+                    items.indexOf(item)
                 )
             (context as MainActivity).g.appBarLayout.setExpanded(false)
             view.findNavController().navigate(direction)
