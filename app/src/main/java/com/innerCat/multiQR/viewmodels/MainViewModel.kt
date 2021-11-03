@@ -55,9 +55,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val items: MutableLiveData<out MutableList<Item>> = MutableLiveData()
 
     init {
-        getSharedPreferences(app)!!.apply {
-            sharedPreferences = this
-            _items = loadData(app, sharedPreferences)
+        sharedPreferences = getSharedPreferences(app)!!.apply {
+            _items = loadData(app, this)
             items.value = _items
         }
     }

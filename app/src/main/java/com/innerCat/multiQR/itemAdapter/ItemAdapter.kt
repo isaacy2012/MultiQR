@@ -25,7 +25,7 @@ class ItemsNotUniqueException : RuntimeException()
  * Item Adapter for Items RecyclerView
  */
 class ItemAdapter(
-    val viewModel: MainViewModel,
+    private val viewModel: MainViewModel,
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     private var itemSet: HashSet<Item>
