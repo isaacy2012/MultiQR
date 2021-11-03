@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainViewModel
 
     lateinit var g: MainActivityBinding
-    
+
     private var actionBarExpanded: Boolean = false
     var state: State = State.MAIN
 

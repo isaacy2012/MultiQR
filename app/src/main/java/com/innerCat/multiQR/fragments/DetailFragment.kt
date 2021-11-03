@@ -70,9 +70,9 @@ class DetailFragment : AbstractMainActivityFragment() {
      */
     private fun setRecyclerViewAdapter() {
         adapter =
-            if (mainActivity.viewModel.items.value!!.isEmpty() == false) {
+            if (viewModel.items.value != null && viewModel.items.value!!.isEmpty() == false) {
                 cellAdapterFromList(
-                    mainActivity.viewModel.items.value!![index].strList
+                    viewModel.items.value!![index].strList
                 )
             } else {
                 emptyCellAdapter()
