@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.databinding.MainActivityBinding
+import com.innerCat.multiQR.viewmodels.MainViewModel
 
 
 abstract class AbstractMainActivityFragment : Fragment() {
@@ -24,6 +25,10 @@ abstract class AbstractMainActivityFragment : Fragment() {
     val mainActivity: MainActivity
         get() {
             return (requireActivity() as MainActivity)
+        }
+    val viewModel: MainViewModel
+        get() {
+            return mainActivity.viewModel
         }
 
     // cache pointer if not null
