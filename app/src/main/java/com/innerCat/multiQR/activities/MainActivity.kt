@@ -28,8 +28,9 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var viewModel: MainViewModel
 
-    private var actionBarExpanded: Boolean = false
     lateinit var g: MainActivityBinding
+    
+    private var actionBarExpanded: Boolean = false
     var state: State = State.MAIN
 
     override fun onCreate(savedInstanceState: Bundle?) {
