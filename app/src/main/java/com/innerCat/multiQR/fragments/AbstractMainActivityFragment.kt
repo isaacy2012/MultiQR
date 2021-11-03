@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.activities.MainActivity
 import com.innerCat.multiQR.databinding.MainActivityBinding
+import com.innerCat.multiQR.util.nullableLazy
 import com.innerCat.multiQR.viewmodels.MainViewModel
 
 
@@ -31,19 +32,9 @@ abstract class AbstractMainActivityFragment : Fragment() {
             return mainActivity.viewModel
         }
 
-    // cache pointer if not null
-    private var _navigationImageButton: ImageButton? = null
-
-    // return a pointer to the "back" button
-    val navigationImageButton: ImageButton?
-        get() {
-            if (_navigationImageButton == null) {
-                // poll if it is still null
-                _navigationImageButton = pollForNavigationImageButton()
-            }
-            // return after poll
-            return _navigationImageButton
-        }
+    val navigationImageButton: ImageButton? by nullableLazy {
+        pollForNavigationImageButton()
+    }
 
     // poll for navigationImageButton
     private fun pollForNavigationImageButton(): ImageButton? {
