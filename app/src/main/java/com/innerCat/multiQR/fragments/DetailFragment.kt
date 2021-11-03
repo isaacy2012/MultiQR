@@ -70,9 +70,9 @@ class DetailFragment : AbstractMainActivityFragment() {
      */
     private fun setRecyclerViewAdapter() {
         adapter =
-            if (mainActivity.items.isEmpty() == false) {
+            if (mainActivity.viewModel.items.isEmpty() == false) {
                 cellAdapterFromList(
-                    mainActivity.items[index].strList
+                    mainActivity.viewModel.items[index].strList
                 )
             } else {
                 emptyCellAdapter()
@@ -94,7 +94,7 @@ class DetailFragment : AbstractMainActivityFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_delete_item -> {
-                mainActivity.mutateData { mainActivity.deleteItemAt(index) }
+                mainActivity.viewModel.deleteItemAt(index)
                 mainActivity.onBackPressed()
                 true
             }
@@ -130,7 +130,7 @@ class DetailFragment : AbstractMainActivityFragment() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (mainActivity.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
+        if (mainActivity.viewModel.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
             manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
         manualG.edit.addTextChangedListener(
