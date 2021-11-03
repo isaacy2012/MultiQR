@@ -9,8 +9,8 @@ import android.graphics.Color
  * @param context the context
  * @return the attr color
  */
-fun getAttrColor(context: Context, colorId: Int): Int {
+fun getAttrColor(context: Context, colorId: Int, fallback: Int = Color.TRANSPARENT): Int {
     val attribute = intArrayOf(colorId)
     val array = context.obtainStyledAttributes(attribute)
-    return array.getColor(0, Color.TRANSPARENT)
+    return array.getColor(0, fallback)
 }
