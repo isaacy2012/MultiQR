@@ -70,9 +70,9 @@ class DetailFragment : AbstractMainActivityFragment() {
      */
     private fun setRecyclerViewAdapter() {
         adapter =
-            if (mainActivity.viewModel.items.isEmpty() == false) {
+            if (mainActivity.viewModel.items.value!!.isEmpty() == false) {
                 cellAdapterFromList(
-                    mainActivity.viewModel.items[index].strList
+                    mainActivity.viewModel.items.value!![index].strList
                 )
             } else {
                 emptyCellAdapter()
@@ -94,7 +94,7 @@ class DetailFragment : AbstractMainActivityFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_delete_item -> {
-                mainActivity.viewModel.deleteItemAt(index)
+                viewModel.deleteItemAt(index)
                 mainActivity.onBackPressed()
                 true
             }
@@ -119,7 +119,7 @@ class DetailFragment : AbstractMainActivityFragment() {
             .setView(manualG.root)
             .setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
                 val output = manualG.edit.text.toString()
-                mainActivity.mutateData { adapter.addString(output) }
+                viewModel.mutateData { adapter.addString(output) }
             }
             .setNegativeButton(
                 "Cancel"
@@ -130,7 +130,7 @@ class DetailFragment : AbstractMainActivityFragment() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (mainActivity.viewModel.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
+        if (viewModel.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
             manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
         manualG.edit.addTextChangedListener(
@@ -169,7 +169,7 @@ class DetailFragment : AbstractMainActivityFragment() {
                 }
                 // and notify the adapter that its dataset has changed
                 adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
-                mainActivity.mutateData {  }
+                viewModel.mutateData {  }
                 return true
             }
 

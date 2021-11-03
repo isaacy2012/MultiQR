@@ -64,7 +64,7 @@ class CellAdapter(
                     val index = strs.indexOf(str)
                     strs[index] = manualG.edit.text.toString()
                     notifyItemChanged(index)
-                    (context as MainActivity).mutateData {}
+                    fragment.viewModel.mutateData {}
                 }
                 .setNegativeButton("Cancel") { _: DialogInterface?, _: Int ->
                     // User cancelled
@@ -73,7 +73,7 @@ class CellAdapter(
                     val index = strs.indexOf(str)
                     strs.removeAt(index)
                     notifyItemRemoved(index)
-                    (context as MainActivity).mutateData {}
+                    fragment.viewModel.mutateData {}
                 }
 
             val dialog = builder.create()

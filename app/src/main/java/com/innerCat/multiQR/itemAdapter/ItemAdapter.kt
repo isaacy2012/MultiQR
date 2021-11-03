@@ -29,9 +29,9 @@ class ItemAdapter(
 ) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     private var itemSet: HashSet<Item>
-    val items: MutableList<Item>
+    val items: List<Item>
         get() {
-            return viewModel.items
+            return viewModel.items.value!!
         }
 
     /**
@@ -88,7 +88,7 @@ class ItemAdapter(
      */
     fun reset() {
         items.forEach { _ -> notifyItemRemoved(0) }
-        items.clear()
+        viewModel.clearItems()
         itemSet.clear()
     }
 
@@ -99,8 +99,8 @@ class ItemAdapter(
      */
     fun addItem(item: Item) {
         if (itemSet.contains(item) == false) {
+            viewModel.addItem(0, item)
             itemSet.add(item)
-            items.add(0, item)
             notifyItemInserted(0)
         }
     }
@@ -114,7 +114,7 @@ class ItemAdapter(
     fun removeItem(item: Item) {
         notifyItemRemoved(items.indexOf(item))
         itemSet.remove(item)
-        items.remove(item)
+        viewModel.removeItem(item)
     }
 
     /**

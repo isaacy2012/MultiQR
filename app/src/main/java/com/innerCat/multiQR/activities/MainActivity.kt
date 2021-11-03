@@ -13,6 +13,7 @@ import com.innerCat.multiQR.databinding.MainActivityBinding
 import com.innerCat.multiQR.util.getShouldShowOnboarding
 import com.innerCat.multiQR.viewmodels.MainViewModel
 import com.innerCat.multiQR.viewmodels.MainViewModelFactory
+import com.innerCat.multiQR.viewmodels.observeImmediately
 
 
 enum class State {
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         val factory = MainViewModelFactory(application)
         viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
 
-        g.toolbarLayout.title = viewModel.getTitleString()
+        viewModel.titleString.observeImmediately(this) {g.toolbarLayout.title = it}
 
         /**
          * Listener for action bar if expanded
@@ -97,15 +98,6 @@ class MainActivity : AppCompatActivity() {
 
          */
     }
-
-    /**
-     * Save the current adapter information to the persistent data storage
-     */
-    fun mutateData(run: () -> Unit) {
-        viewModel.mutateData(run);
-        g.toolbarLayout.title = viewModel.getTitleString()
-    }
-
 
     /**
      * TODO Replace with new way

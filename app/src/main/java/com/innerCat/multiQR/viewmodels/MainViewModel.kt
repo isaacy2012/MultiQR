@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
@@ -17,6 +19,19 @@ import java.io.File
 import java.io.FileWriter
 
 /**
+ * Observe immediately
+ *
+ * @param T type parameter
+ * @param lifecycleOwner the lifecycleOwner
+ * @param callback the callback to call immediately
+ * @receiver
+ */
+fun <T> LiveData<T>.observeImmediately(lifecycleOwner: LifecycleOwner, callback: (T) -> Unit) {
+    this.observe(lifecycleOwner, callback)
+    this.value?.let { callback(it) }
+}
+
+/**
  * Main view model
  *
  * @constructor
@@ -24,22 +39,67 @@ import java.io.FileWriter
  * @param application
  */
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+    /**
+     * Shared preferences
+     */
     val sharedPreferences: SharedPreferences
-    var items: MutableList<Item> = ArrayList()
-    private val liveItems: MutableLiveData<out MutableList<Item>> = MutableLiveData(items)
-    val rvVisibility: MutableLiveData<Boolean> = MutableLiveData(items.size > 0).apply {
-        liveItems.observeForever{value = it.size > 0}
-    }
-    private lateinit var matchRegex: OptionalRegex
-    lateinit var splitRegex: OptionalRegex
-    val app: Application get() { return getApplication<Application>() }
+
+    /**
+     * Items
+     */
+    private var _items: MutableList<Item>
+
+    /**
+     * Live items
+     */
+    val items: MutableLiveData<out MutableList<Item>> = MutableLiveData()
 
     init {
         getSharedPreferences(app)!!.apply {
             sharedPreferences = this
-            items = loadData(app, sharedPreferences)
+            _items = loadData(app, sharedPreferences)
+            items.value = _items
         }
     }
+
+    /**
+     * Set items
+     *
+     * @param newItems
+     */
+    fun setItems(newItems: MutableList<Item>) {
+        this._items = newItems
+        items.value = this._items
+    }
+
+    /**
+     * Rv visibility
+     */
+    val rvVisibility: LiveData<Boolean> = MutableLiveData(_items.size > 0).apply {
+        items.observeForever{value = it.size > 0}
+   }
+
+    /**
+     * Title string
+     */
+    val titleString: LiveData<String> = MutableLiveData(getTitleString(_items.size)).apply {
+        items.observeForever{value = getTitleString(it.size)}
+    }
+
+    /**
+     * Match regex
+     */
+    private lateinit var matchRegex: OptionalRegex
+
+    /**
+     * Split regex
+     */
+    lateinit var splitRegex: OptionalRegex
+
+    /**
+     * App
+     */
+    val app: Application get() { return getApplication<Application>() }
 
 
     /**
@@ -50,38 +110,66 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         splitRegex = sharedPreferences.getSplitRegex(app)
     }
 
+
+    /**
+     * Save the current adapter information to the persistent data storage
+     */
+    fun mutateData(run: () -> Unit) {
+        dp { println("BEFORE $_items") }
+        run()
+        dp { println("AFTER$_items") }
+        saveData(
+            _items,
+            sharedPreferences,
+            app.getString(R.string.sp_items)
+        )
+        items.value = _items
+    }
+
     /**
      * Delete the item at a particular index
      *
      * @param index
      */
     fun deleteItemAt(index: Int) {
-        mutateData { items.removeAt(index) }
+        mutateData { _items.removeAt(index) }
     }
 
     /**
-     * Save the current adapter information to the persistent data storage
+     * Clear items
+     *
      */
-    fun mutateData(run: () -> Unit) {
-        dp { println("BEFORE " + items) }
-        run()
-        dp { println("AFTER" + items) }
-        saveData(
-            items,
-            sharedPreferences,
-            app.getString(R.string.sp_items)
-        )
-        liveItems.value = items
+    fun clearItems() {
+        mutateData { _items.clear() }
     }
 
     /**
-     * Manual add
+     * Add item
+     *
+     * @param index
+     * @param item
+     */
+    fun addItem(index: Int, item: Item) {
+        mutateData { _items.add(index, item) }
+    }
+
+    /**
+     * Remove item
+     *
+     * @param item
+     */
+    fun removeItem(item: Item) {
+        mutateData { _items.remove(item) }
+    }
+
+    /**
+     * Make item
      *
      * @param input the input string
      * @param onSuccess when the match was successful
      * @param onFailure when the match was successful
      */
-    fun add(input: String, onSuccess: (Item) -> Unit, onFailure: (Regex) -> Unit) {
+    fun makeItem(input: String, onSuccess: (Item) -> Unit, onFailure: (Regex) -> Unit) {
         if (matchRegex.passes(input)) {
             onSuccess(Item(input, splitRegex))
         } else {
@@ -90,11 +178,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Gets the title string counting how many items there are
-     * @return How many items there are as a formatted string
+     * Gets the title string counting how many _items there are
+     * @return How many _items there are as a formatted string
      */
-    fun getTitleString(): String {
-        return when (val count = items.size) {
+    private fun getTitleString(count: Int): String {
+        return when (count) {
             0 -> {
                 "No items"
             }
@@ -152,7 +240,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         // Write file with csvPrinter
-        items.forEach {
+        _items.forEach {
             csvPrinter.printRecord(it.strList)
         }
         fileWriter.close()

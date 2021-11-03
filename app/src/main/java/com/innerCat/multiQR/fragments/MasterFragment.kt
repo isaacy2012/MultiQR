@@ -29,6 +29,7 @@ import com.innerCat.multiQR.itemAdapter.ItemsNotUniqueException
 import com.innerCat.multiQR.itemAdapter.MAX_COLS
 import com.innerCat.multiQR.util.clearData
 import com.innerCat.multiQR.util.getItemType
+import com.innerCat.multiQR.viewmodels.observeImmediately
 import com.innerCat.multiQR.views.HeaderTextView
 import com.innerCat.multiQR.views.makeMoreHorizontal
 import java.lang.Integer.min
@@ -80,15 +81,14 @@ class MasterFragment : AbstractMainActivityFragment() {
             try {
                 ItemAdapter(viewModel)
             } catch (e: ItemsNotUniqueException) {
-                viewModel.items = ArrayList(HashSet(viewModel.items))
+                viewModel.setItems(ArrayList(HashSet(viewModel.items.value!!)))
                 ItemAdapter(viewModel)
             }
         // Attach the adapter to the recyclerview to populate items
         g.rvItems.adapter = adapter
         // Set layout manager to position the items
         g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
-        viewModel.rvVisibility.observe(viewLifecycleOwner){updateRVVisibility(it)}
-        updateRVVisibility(viewModel.rvVisibility.value?:false)
+        viewModel.rvVisibility.observeImmediately(viewLifecycleOwner){updateRVVisibility(it)}
     }
 
     /**
@@ -162,7 +162,7 @@ class MasterFragment : AbstractMainActivityFragment() {
             .setView(manualG.root)
             .setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
                 val input = manualG.edit.text.toString()
-                viewModel.add(input,
+                viewModel.makeItem(input,
                     onSuccess = { item -> addItem(item) },
                     onFailure = { regex ->
                         showMatchFailureDialog(
@@ -269,18 +269,11 @@ class MasterFragment : AbstractMainActivityFragment() {
     }
 
     /**
-     * mutateData
-     */
-    private fun mutateData(run: () -> Unit) {
-        mainActivity.mutateData(run)
-    }
-
-    /**
      * Add an item to the adapter and persistent data storage
      * @param item the Id object to add
      */
     fun addItem(item: Item) {
-        mutateData { adapter.addItem(item) }
+        viewModel.mutateData { adapter.addItem(item) }
     }
 
     /**
@@ -288,7 +281,7 @@ class MasterFragment : AbstractMainActivityFragment() {
      * @param item The Id object to remove
      */
     internal fun removeItem(item: Item) {
-        mutateData { adapter.removeItem(item) }
+        viewModel.mutateData { adapter.removeItem(item) }
     }
 
 
@@ -342,7 +335,7 @@ class MasterFragment : AbstractMainActivityFragment() {
             result.contents?.let { contents ->
                 beep()
                 val input = contents.filterNot { it == '\n' }.filterNot { it == '\r' }
-                viewModel.add(input,
+                viewModel.makeItem(input,
                     onSuccess = { item ->
                         addItem(item)
                         if (batchScanEnabled()) {
