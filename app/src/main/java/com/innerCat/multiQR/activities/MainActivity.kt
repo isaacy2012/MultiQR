@@ -1,21 +1,18 @@
 package com.innerCat.multiQR.activities
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil.setContentView
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
-import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.R
 import com.innerCat.multiQR.databinding.MainActivityBinding
-import com.innerCat.multiQR.dp
-import com.innerCat.multiQR.factories.getSharedPreferences
 import com.innerCat.multiQR.util.getShouldShowOnboarding
-import com.innerCat.multiQR.util.loadData
-import com.innerCat.multiQR.util.saveData
+import com.innerCat.multiQR.viewmodels.MainViewModel
+import com.innerCat.multiQR.viewmodels.MainViewModelFactory
 
 
 enum class State {
@@ -28,21 +25,21 @@ enum class State {
  */
 class MainActivity : AppCompatActivity() {
 
+    lateinit var viewModel: MainViewModel
+
     var actionBarExpanded: Boolean = false
     lateinit var g: MainActivityBinding
-    lateinit var items: MutableList<Item>
-    lateinit var sharedPreferences: SharedPreferences
     var state: State = State.MAIN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getSharedPreferences(this)?.let {
-            sharedPreferences = it
-        }
-        items = loadData(this, sharedPreferences)
 
         g = setContentView(this, R.layout.main_activity)
-        g.toolbarLayout.title = getTitleString()
+
+        val factory = MainViewModelFactory(application)
+        viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
+
+        g.toolbarLayout.title = viewModel.getTitleString()
 
         /**
          * Listener for action bar if expanded
@@ -55,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 //        sharedPreferences.edit {
 //            putBoolean(getString(R.string.sp_should_show_onboarding), true)
 //        }
-        if (sharedPreferences.getShouldShowOnboarding(this)) {
+        if (viewModel.sharedPreferences.getShouldShowOnboarding(this)) {
             showOnboarding()
         }
 
@@ -102,39 +99,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Delete the item at a particular index
-     */
-    fun deleteItemAt(index: Int) {
-        items.removeAt(index)
-    }
-
-    /**
      * Save the current adapter information to the persistent data storage
      */
     fun mutateData(run: () -> Unit) {
-        dp { println("BEFORE " + items) }
-        run()
-        dp { println("AFTER" + items) }
-        saveData(items, sharedPreferences, getString(R.string.sp_items))
-        g.toolbarLayout.title = getTitleString()
-    }
-
-    /**
-     * Gets the title string counting how many items there are
-     * @return How many items there are as a formatted string
-     */
-    private fun getTitleString(): String {
-        return when (val count = items.size) {
-            0 -> {
-                "No items"
-            }
-            1 -> {
-                "$count item"
-            }
-            else -> {
-                "$count items"
-            }
-        }
+        viewModel.mutateData(run);
+        g.toolbarLayout.title = viewModel.getTitleString()
     }
 
 
