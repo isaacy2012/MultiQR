@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var viewModel: MainViewModel
 
-    var actionBarExpanded: Boolean = false
+    private var actionBarExpanded: Boolean = false
     lateinit var g: MainActivityBinding
     var state: State = State.MAIN
 
