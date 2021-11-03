@@ -1,22 +1,9 @@
 package com.innerCat.multiQR.factories
 
-import com.innerCat.multiQR.Item
 import com.innerCat.multiQR.fragments.DetailFragment
-import com.innerCat.multiQR.fragments.MasterFragment
-import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.strAdapter.CellAdapter
 import java.util.*
 
-
-
-/**
- * Item adapter from list
- *
- * @return the item adapter
- */
-fun MasterFragment.itemAdapterFromList(list: MutableList<Item>): ItemAdapter {
-    return ItemAdapter(this, list)
-}
 
 
 /**
