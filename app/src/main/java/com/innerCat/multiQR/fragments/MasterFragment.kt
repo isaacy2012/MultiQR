@@ -13,7 +13,6 @@ import android.view.*
 import android.view.View.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.core.text.bold
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,26 +24,25 @@ import com.innerCat.multiQR.activities.SettingsActivity
 import com.innerCat.multiQR.databinding.FragmentMasterBinding
 import com.innerCat.multiQR.databinding.ManualInputBinding
 import com.innerCat.multiQR.factories.getManualAddTextWatcher
-import com.innerCat.multiQR.factories.itemAdapterFromList
 import com.innerCat.multiQR.itemAdapter.ItemAdapter
 import com.innerCat.multiQR.itemAdapter.ItemsNotUniqueException
 import com.innerCat.multiQR.itemAdapter.MAX_COLS
-import com.innerCat.multiQR.util.*
+import com.innerCat.multiQR.util.clearData
+import com.innerCat.multiQR.util.getItemType
 import com.innerCat.multiQR.views.HeaderTextView
 import com.innerCat.multiQR.views.makeMoreHorizontal
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVPrinter
-import java.io.File
-import java.io.FileWriter
 import java.lang.Integer.min
 
 
+/**
+ * Master fragment
+ *
+ * @constructor Create empty Master fragment
+ */
 class MasterFragment : AbstractMainActivityFragment() {
 
     private lateinit var g: FragmentMasterBinding
     private lateinit var adapter: ItemAdapter
-    private lateinit var matchRegex: OptionalRegex
-    lateinit var splitRegex: OptionalRegex
 
 
     override fun onCreateView(
@@ -77,40 +75,36 @@ class MasterFragment : AbstractMainActivityFragment() {
      * Set the recyclerview Adapter
      */
     private fun setRecyclerViewAdapter() {
-        // Create adapter from mainActivity.sharedPreferences
+        // Create adapter from viewModel.sharedPreferences
         adapter =
             try {
-                itemAdapterFromList(
-                    mainActivity.items
-                )
+                ItemAdapter(viewModel)
             } catch (e: ItemsNotUniqueException) {
-                mainActivity.items = ArrayList(HashSet(mainActivity.items))
-                itemAdapterFromList(
-                    mainActivity.items
-                )
+                viewModel.items = ArrayList(HashSet(viewModel.items))
+                ItemAdapter(viewModel)
             }
         // Attach the adapter to the recyclerview to populate items
         g.rvItems.adapter = adapter
         // Set layout manager to position the items
         g.rvItems.layoutManager = LinearLayoutManager(requireActivity())
-        updateRVVisibility()
+        viewModel.rvVisibility.observe(viewLifecycleOwner){updateRVVisibility(it)}
+        updateRVVisibility(viewModel.rvVisibility.value?:false)
     }
 
     /**
      * Refresh regex from sharedPreferences
      */
     private fun refresh() {
-        matchRegex = mainActivity.sharedPreferences.getMatchRegex(requireActivity())
-        splitRegex = mainActivity.sharedPreferences.getSplitRegex(requireActivity())
+        viewModel.refreshRegex()
         populateHeader()
     }
 
     /**
-     * Populate the table header from mainActivity.sharedPreferences
+     * Populate the table header from viewModel.sharedPreferences
      */
     private fun populateHeader() {
         g.headerLayout.removeAllViews()
-        getHeaderStrings()?.let {
+        viewModel.getHeaderStrings()?.let {
             for (i in 0 until min(MAX_COLS, it.size)) {
                 val spacedTextView = HeaderTextView(requireActivity(), it[i])
                 g.headerLayout.addView(spacedTextView)
@@ -127,18 +121,6 @@ class MasterFragment : AbstractMainActivityFragment() {
 //        }
     }
 
-    private fun getHeaderStrings(): List<String>? {
-        val headerString =
-            mainActivity.sharedPreferences.getString(
-                getString(R.string.sp_column_headers_string),
-                null
-            )
-        if (headerString == null || headerString == "") {
-            return null
-        }
-        return splitRegex.split(headerString)
-    }
-
 
     /**
      * Ask the user if they are sure that all the IDs should be cleared
@@ -153,7 +135,7 @@ class MasterFragment : AbstractMainActivityFragment() {
         )
             .setPositiveButton("Delete") { _: DialogInterface?, _: Int ->
                 adapter.reset()
-                clearData(mainActivity.sharedPreferences, getString(R.string.sp_items))
+                clearData(viewModel.sharedPreferences, getString(R.string.sp_items))
             }
             .setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> }
         val dialog = builder.create()
@@ -179,15 +161,15 @@ class MasterFragment : AbstractMainActivityFragment() {
         builder.setTitle("Add Item")
             .setView(manualG.root)
             .setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
-                val output = manualG.edit.text.toString()
-                if (matchRegex.passes(output)) {
-                    addItem(Item(output, splitRegex))
-                } else {
-                    showMatchFailureDialog(
-                        output,
-                        (matchRegex as EnabledRegex).regex
-                    ) {} // don't do anything else when manual add
-                }
+                val input = manualG.edit.text.toString()
+                viewModel.add(input,
+                    onSuccess = { item -> addItem(item) },
+                    onFailure = { regex ->
+                        showMatchFailureDialog(
+                            input,
+                            regex
+                        ) {} // don't do anything else when manual add
+                    })
             }
             .setNegativeButton(
                 "Cancel"
@@ -198,7 +180,7 @@ class MasterFragment : AbstractMainActivityFragment() {
         dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.isEnabled = true
-        if (mainActivity.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
+        if (viewModel.sharedPreferences.getItemType(mainActivity).equals("numeric")) {
             manualG.edit.inputType = InputType.TYPE_CLASS_NUMBER
         }
         manualG.edit.addTextChangedListener(
@@ -207,7 +189,6 @@ class MasterFragment : AbstractMainActivityFragment() {
                 okButton
             )
         )
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -284,42 +265,7 @@ class MasterFragment : AbstractMainActivityFragment() {
      * Export a CSV to another app
      */
     private fun export() {
-        val filesDir = requireActivity().filesDir
-        // Delete old files
-        filesDir.listFiles()?.forEach {
-            it.delete()
-        }
-        // Make new file
-        val file = File(
-            filesDir,
-            mainActivity.sharedPreferences.getExportFileName(requireActivity()) + ".csv"
-        )
-        val fileWriter = FileWriter(file)
-        val csvPrinter = getHeaderStrings()?.toTypedArray()?.let {
-            CSVPrinter(
-                fileWriter,
-                CSVFormat.Builder.create().setHeader(*it).setAllowMissingColumnNames(true)
-                    .build()
-            )
-        } ?: run {
-            CSVPrinter(fileWriter, CSVFormat.DEFAULT)
-        }
-
-        // Write file with csvPrinter
-        adapter.itemList.forEach {
-            csvPrinter.printRecord(it.strList)
-        }
-        fileWriter.close()
-
-        // Send file
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.putExtra(
-            Intent.EXTRA_STREAM,
-            FileProvider.getUriForFile(requireActivity(), "com.multiQR.FileProvider", file)
-        );
-        intent.type = "text/csv";
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(intent)
+        startActivity(viewModel.exportToCsvIntent())
     }
 
     /**
@@ -327,14 +273,13 @@ class MasterFragment : AbstractMainActivityFragment() {
      */
     private fun mutateData(run: () -> Unit) {
         mainActivity.mutateData(run)
-        updateRVVisibility()
     }
 
     /**
      * Add an item to the adapter and persistent data storage
      * @param item the Id object to add
      */
-    private fun addItem(item: Item) {
+    fun addItem(item: Item) {
         mutateData { adapter.addItem(item) }
     }
 
@@ -346,13 +291,14 @@ class MasterFragment : AbstractMainActivityFragment() {
         mutateData { adapter.removeItem(item) }
     }
 
-    fun updateRVVisibility() {
-        if (adapter.itemList.isEmpty()) {
-            g.rvItems.visibility = GONE
-            g.emptyLayout.visibility = VISIBLE
-        } else {
+
+    fun updateRVVisibility(visible: Boolean) {
+        if (visible) {
             g.rvItems.visibility = VISIBLE
             g.emptyLayout.visibility = GONE
+        } else {
+            g.rvItems.visibility = GONE
+            g.emptyLayout.visibility = VISIBLE
         }
     }
 
@@ -376,7 +322,7 @@ class MasterFragment : AbstractMainActivityFragment() {
             ssb
         )
             .setPositiveButton("Add") { _: DialogInterface?, _: Int ->
-                addItem(Item(output, splitRegex))
+                addItem(Item(output, viewModel.splitRegex))
                 onComplete()
             }
             .setNegativeButton("Discard") { _: DialogInterface?, _: Int ->
@@ -395,23 +341,26 @@ class MasterFragment : AbstractMainActivityFragment() {
             // If user didn't cancel, there will be contents
             result.contents?.let { contents ->
                 beep()
-                val output = contents.filterNot { it == '\n' }.filterNot { it == '\r' }
-                if (matchRegex.passes(output)) {
-                    addItem(Item(output, splitRegex))
-                    if (batchScanEnabled()) {
-                        initiateScan()
-                    }
-                } else {
-                    showMatchFailureDialog(
-                        output, (matchRegex as EnabledRegex).regex
-                    ) {
+                val input = contents.filterNot { it == '\n' }.filterNot { it == '\r' }
+                viewModel.add(input,
+                    onSuccess = { item ->
+                        addItem(item)
                         if (batchScanEnabled()) {
                             initiateScan()
                         }
+                    },
+                    onFailure = { regex ->
+                        showMatchFailureDialog(
+                            input, regex
+                        ) {
+                            if (batchScanEnabled()) {
+                                initiateScan()
+                            }
+                        }
                     }
-                }
-            }
-        } ?: super.onActivityResult(requestCode, resultCode, data)
+                )
+            } ?: super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     var launchActivityForResult =
@@ -429,7 +378,7 @@ class MasterFragment : AbstractMainActivityFragment() {
      * @return Whether batch scanning is enabled
      */
     private fun batchScanEnabled(): Boolean {
-        return mainActivity.sharedPreferences.getBoolean(getString(R.string.sp_batch_scan), true)
+        return viewModel.sharedPreferences.getBoolean(getString(R.string.sp_batch_scan), true)
     }
 
     /**
@@ -445,6 +394,5 @@ class MasterFragment : AbstractMainActivityFragment() {
             toneGenerator.release()
         }, (length + 50).toLong())
     }
-
 
 }
